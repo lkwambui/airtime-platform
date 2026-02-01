@@ -8,6 +8,7 @@ import BuyModeToggle from "../components/BuyModeToggle";
 import type { BuyMode } from "../components/BuyModeToggle";
 import AirtimeForm from "../components/AirtimeForm";
 import AirtimePreview from "../components/AirtimePreview";
+import WhyBuy from "../components/WhyBuy";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -83,6 +84,8 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <WhyBuy />
     </div>
   );
 }
