@@ -4,11 +4,11 @@ import { db } from "../database/db";
 // GET /api/settings
 export async function getSettings(_req: Request, res: Response) {
   try {
-    const [rows] = await db.query(
+    const result = await db.query(
       "SELECT rate, in_stock FROM settings WHERE id = 1",
     );
 
-    const settings = (rows as any[])[0];
+    const settings = result.rows[0];
 
     res.json({
       rate: Number(settings.rate),
@@ -27,7 +27,7 @@ export async function updateSettings(req: Request, res: Response) {
   try {
     const { rate, inStock } = req.body;
 
-    await db.query("UPDATE settings SET rate = ?, in_stock = ? WHERE id = 1", [
+    await db.query("UPDATE settings SET rate = $1, in_stock = $2 WHERE id = 1", [
       rate,
       inStock,
     ]);

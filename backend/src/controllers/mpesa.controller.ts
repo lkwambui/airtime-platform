@@ -25,16 +25,16 @@ export async function mpesaCallback(req: Request, res: Response) {
 
     if (cb.ResultCode === 0) {
       // payment success
-      await db.query("UPDATE transactions SET status='SUCCESS' WHERE id=?", [
+      await db.query("UPDATE transactions SET status='SUCCESS' WHERE id=$1", [
         ref,
       ]);
 
-      const [rows] = await db.query(
-        "SELECT receiver_phone, airtime_value FROM transactions WHERE id=?",
+      const txResult = await db.query(
+        "SELECT receiver_phone, airtime_value FROM transactions WHERE id=$1",
         [ref],
       );
 
-      const tx = (rows as any[])[0];
+      const tx = txResult.rows[0];
 
       if (!tx) {
         logError("Transaction not found after payment success", ref);
@@ -45,7 +45,7 @@ export async function mpesaCallback(req: Request, res: Response) {
       await sendAirtime(tx.receiver_phone, tx.airtime_value);
 
       await db.query(
-        "UPDATE transactions SET status='AIRTIME_SENT' WHERE id=?",
+        "UPDATE transactions SET status='AIRTIME_SENT' WHERE id=$1",
         [ref],
       );
 
@@ -56,7 +56,7 @@ export async function mpesaCallback(req: Request, res: Response) {
       });
     } else {
       // payment failed or cancelled
-      await db.query("UPDATE transactions SET status='FAILED' WHERE id=?", [
+      await db.query("UPDATE transactions SET status='FAILED' WHERE id=$1", [
         ref,
       ]);
 

@@ -14,21 +14,23 @@ export async function initiatePayment(req: Request, res: Response) {
     }
 
     // get rate
-    const [rows] = await db.query("SELECT rate FROM settings WHERE id = 1");
-    const rate = (rows as any[])[0].rate;
+    const rateResult = await db.query("SELECT rate FROM settings WHERE id = 1");
+    const rate = rateResult.rows[0].rate;
 
     // calculate airtime
     const airtime = calculateAirtime(amount, rate);
 
     // save transaction
-    const [result] = await db.query(
+    const txResult = await db.query(
       `INSERT INTO transactions
        (payer_phone, receiver_phone, amount_paid, airtime_value, rate_used)
-       VALUES (?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
       [payerPhone, receiverPhone, amount, airtime, rate],
     );
+    const transactionId = txResult.rows[0].id;
 
-    const txId = (result as any).insertId;
+    const txId = transactionId;
 
     // send STK push
     await stkPush(payerPhone, amount, `TX-${txId}`);

@@ -8,13 +8,13 @@ import { logInfo, logError } from "../utils/logger";
  */
 export async function retryAirtimeJobs() {
   try {
-    const [rows] = await db.query(
+    const result = await db.query(
       `SELECT id, receiver_phone, airtime_value
        FROM transactions
        WHERE status = 'SUCCESS'`,
     );
 
-    const transactions = rows as any[];
+    const transactions = result.rows;
 
     if (transactions.length === 0) {
       logInfo("No airtime retries pending");
