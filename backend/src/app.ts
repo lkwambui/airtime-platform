@@ -17,7 +17,7 @@ app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
 
 // DB health check (temporary)
-app.get("/db-health", async (_req, res) => {
+app.get("/db-health", async (_req: express.Request, res: express.Response) => {
   try {
     await db.query("SELECT NOW()");
 
