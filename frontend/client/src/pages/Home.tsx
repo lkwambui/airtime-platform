@@ -48,44 +48,50 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-linear-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-linear-to-br from-gray-50 via-white to-gray-50'} flex justify-center items-center px-4 py-6 md:py-12`}>
-      <div className={`w-full max-w-lg ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white/80'} backdrop-blur-xl rounded-3xl ${theme === 'dark' ? 'border border-slate-700/50' : 'border border-gray-200/50'} shadow-2xl p-8 space-y-6 hover:shadow-2xl transition-shadow duration-300`}>
-        <Header />
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+        {/* Why Buy Section - Left Side */}
+        <div className="w-full lg:w-1/3 lg:sticky lg:top-8">
+          <WhyBuy />
+        </div>
 
-        {success && (
-          <div className={`${theme === 'dark' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'} border rounded-xl p-4 text-sm font-medium animate-fade-in`}>
-            ✓ STK Push sent successfully! Check your phone.
-          </div>
-        )}
+        {/* Main Form Section - Right Side */}
+        <div className={`w-full lg:w-2/3 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white/80'} backdrop-blur-xl rounded-3xl ${theme === 'dark' ? 'border border-slate-700/50' : 'border border-gray-200/50'} shadow-2xl p-8 space-y-6 hover:shadow-2xl transition-shadow duration-300`}>
+          <Header />
 
-        {error && (
-          <div className={`${theme === 'dark' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl p-4 text-sm font-medium`}>
-            ✕ {error}
-          </div>
-        )}
+          {success && (
+            <div className={`${theme === 'dark' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'} border rounded-xl p-4 text-sm font-medium animate-fade-in`}>
+              ✓ STK Push sent successfully! Check your phone.
+            </div>
+          )}
 
-        <RateDisplay rate={rate} inStock={inStock} />
+          {error && (
+            <div className={`${theme === 'dark' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl p-4 text-sm font-medium`}>
+              ✕ {error}
+            </div>
+          )}
 
-        <BuyModeToggle mode={mode} onChange={setMode} />
+          <RateDisplay rate={rate} inStock={inStock} />
 
-        <AirtimePreview amount={amount} rate={rate} />
+          <BuyModeToggle mode={mode} onChange={setMode} />
 
-        {inStock ? (
-          <AirtimeForm
-            mode={mode}
-            onSubmit={(data) => {
-              setAmount(data.amount);
-              submit(data);
-            }}
-            loading={loading}
-          />
-        ) : (
-          <div className="bg-red-50 text-red-700 p-4 rounded-lg text-center font-semibold">
-            Airtime is currently out of stock. Please check again later.
-          </div>
-        )}
+          <AirtimePreview amount={amount} rate={rate} />
+
+          {inStock ? (
+            <AirtimeForm
+              mode={mode}
+              onSubmit={(data) => {
+                setAmount(data.amount);
+                submit(data);
+              }}
+              loading={loading}
+            />
+          ) : (
+            <div className={`${theme === 'dark' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl p-4 text-center font-semibold`}>
+              Airtime is currently out of stock. Please check again later.
+            </div>
+          )}
+        </div>
       </div>
-
-      <WhyBuy />
     </div>
   );
 }
