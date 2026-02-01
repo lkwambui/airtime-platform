@@ -43,8 +43,7 @@ services:
 
   # Admin Frontend
   - type: web
-    name: airti
-    plan: freeme-admin
+    name: airtime-admin
     env: static
     buildCommand: cd frontend/admin && npm install && npm run build
     staticPublishPath: frontend/admin/dist
@@ -55,8 +54,7 @@ services:
 
   # Client Frontend
   - type: web
-    name: airti
-    plan: freeme-client
+    name: airtime-client
     env: static
     buildCommand: cd frontend/client && npm install && npm run build
     staticPublishPath: frontend/client/dist
