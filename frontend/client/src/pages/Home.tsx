@@ -68,14 +68,20 @@ export default function Home() {
 
         <AirtimePreview amount={amount} rate={rate} />
 
-        <AirtimeForm
-          mode={mode}
-          onSubmit={(data) => {
-            setAmount(data.amount);
-            submit(data);
-          }}
-          loading={loading}
-        />
+        {inStock ? (
+          <AirtimeForm
+            mode={mode}
+            onSubmit={(data) => {
+              setAmount(data.amount);
+              submit(data);
+            }}
+            loading={loading}
+          />
+        ) : (
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg text-center font-semibold">
+            Airtime is currently out of stock. Please check again later.
+          </div>
+        )}
       </div>
     </div>
   );

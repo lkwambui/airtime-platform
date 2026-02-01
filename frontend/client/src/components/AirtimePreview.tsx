@@ -7,7 +7,7 @@ type Props = {
 
 export default function AirtimePreview({ amount, rate }: Props) {
   const { theme } = useTheme();
-  const airtime = amount > 0 ? (amount * rate) / 100 : 0;
+  const airtime = amount > 0 ? amount / (rate / 100) : 0;
 
   return (
     <div className="relative group">
