@@ -1,15 +1,16 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: airtime-db
-    env: docker
+databases:
+  - name: airtime-db
+    databaseName: airtime_platform
+    user: airtime_user
     plan: free
-    region: oregon
+
+services:
 
   # Backend API
   - type: web
     name: airtime-backend
     env: node
+    plan: free
     region: oregon
     buildCommand: cd backend && npm install && npm run build
     startCommand: cd backend && npm start
@@ -42,7 +43,8 @@ services:
 
   # Admin Frontend
   - type: web
-    name: airtime-admin
+    name: airti
+    plan: freeme-admin
     env: static
     buildCommand: cd frontend/admin && npm install && npm run build
     staticPublishPath: frontend/admin/dist
@@ -53,7 +55,8 @@ services:
 
   # Client Frontend
   - type: web
-    name: airtime-client
+    name: airti
+    plan: freeme-client
     env: static
     buildCommand: cd frontend/client && npm install && npm run build
     staticPublishPath: frontend/client/dist
