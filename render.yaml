@@ -1,0 +1,46 @@
+services:
+  # Backend API
+  - type: web
+    name: airtime-backend
+    env: node
+    region: oregon
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 3306
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: airtime_platform
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /db-health
+
+  # Admin Frontend
+  - type: web
+    name: airtime-admin
+    env: static
+    buildCommand: cd frontend/admin && npm install && npm run build
+    staticPublishPath: frontend/admin/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # Client Frontend
+  - type: web
+    name: airtime-client
+    env: static
+    buildCommand: cd frontend/client && npm install && npm run build
+    staticPublishPath: frontend/client/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
