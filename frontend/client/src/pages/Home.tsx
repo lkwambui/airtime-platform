@@ -49,13 +49,13 @@ export default function Home() {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-linear-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-linear-to-br from-gray-50 via-white to-gray-50'} flex justify-center items-center px-4 py-6 md:py-12`}>
       <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
-        {/* Why Buy Section - Left Side */}
-        <div className="w-full lg:w-1/3 lg:sticky lg:top-8">
+        {/* Why Buy Section - Left Side on desktop, Below on mobile */}
+        <div className="w-full lg:w-1/3 lg:sticky lg:top-8 order-2 lg:order-1">
           <WhyBuy />
         </div>
 
-        {/* Main Form Section - Right Side */}
-        <div className={`w-full lg:w-2/3 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white/80'} backdrop-blur-xl rounded-3xl ${theme === 'dark' ? 'border border-slate-700/50' : 'border border-gray-200/50'} shadow-2xl p-8 space-y-6 hover:shadow-2xl transition-shadow duration-300`}>
+        {/* Main Form Section - Right Side on desktop, Above on mobile */}
+        <div className={`w-full lg:w-2/3 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white/80'} backdrop-blur-xl rounded-3xl ${theme === 'dark' ? 'border border-slate-700/50' : 'border border-gray-200/50'} shadow-2xl p-8 space-y-6 hover:shadow-2xl transition-shadow duration-300 order-1 lg:order-2`}>
           <Header />
 
           {success && (
