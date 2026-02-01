@@ -1,4 +1,11 @@
 services:
+  # PostgreSQL Database
+  - type: pserv
+    name: airtime-db
+    env: docker
+    plan: free
+    region: oregon
+
   # Backend API
   - type: web
     name: airtime-backend
@@ -10,15 +17,25 @@ services:
       - key: NODE_ENV
         value: production
       - key: DB_HOST
-        sync: false
+        fromDatabase:
+          name: airtime-db
+          property: host
       - key: DB_PORT
-        value: 3306
+        fromDatabase:
+          name: airtime-db
+          property: port
       - key: DB_USER
-        sync: false
+        fromDatabase:
+          name: airtime-db
+          property: user
       - key: DB_PASSWORD
-        sync: false
+        fromDatabase:
+          name: airtime-db
+          property: password
       - key: DB_NAME
-        value: airtime_platform
+        fromDatabase:
+          name: airtime-db
+          property: database
       - key: JWT_SECRET
         generateValue: true
     healthCheckPath: /db-health

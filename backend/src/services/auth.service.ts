@@ -3,12 +3,12 @@ import jwt from "jsonwebtoken";
 import { db } from "../database/db";
 
 export async function authenticateAdmin(username: string, password: string) {
-  const [rows] = await db.query(
-    "SELECT id, password_hash FROM admins WHERE username = ?",
+  const result = await db.query(
+    "SELECT id, password_hash FROM admins WHERE username = $1",
     [username],
   );
 
-  const admin = (rows as any[])[0];
+  const admin = result.rows[0];
   if (!admin) {
     throw new Error("INVALID_CREDENTIALS");
   }

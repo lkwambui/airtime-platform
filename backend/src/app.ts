@@ -19,9 +19,7 @@ app.use("/api/admin", adminRoutes);
 // DB health check (temporary)
 app.get("/db-health", async (_req, res) => {
   try {
-    const conn = await db.getConnection();
-    await conn.ping();
-    conn.release();
+    await db.query("SELECT NOW()");
 
     res.json({
       status: "OK",
