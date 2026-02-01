@@ -17,7 +17,7 @@ export default function BuyModeToggle({ mode, onChange }: Props) {
         className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
           mode === "SELF"
             ? "bg-linear-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30"
-            : `${theme === 'dark' ? 'text-slate-400 hover:text-slate-200' : 'text-gray-600 hover:text-gray-800'}`
+            : `${theme === 'dark' ? 'text-slate-200 hover:text-slate-100' : 'text-gray-800 hover:text-gray-900'}`
         }`}
       >
         <span className="text-lg mr-2">👤</span> My Number
@@ -28,7 +28,7 @@ export default function BuyModeToggle({ mode, onChange }: Props) {
         className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
           mode === "OTHER"
             ? "bg-linear-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30"
-            : `${theme === 'dark' ? 'text-slate-400 hover:text-slate-200' : 'text-gray-600 hover:text-gray-800'}`
+            : `${theme === 'dark' ? 'text-slate-200 hover:text-slate-100' : 'text-gray-800 hover:text-gray-900'}`
         }`}
       >
         <span className="text-lg mr-2">🎁</span> Other Number
