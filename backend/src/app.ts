@@ -1,0 +1,42 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import cors from "cors";
+import publicRoutes from "./routes/public.routes";
+import adminRoutes from "./routes/admin.routes";
+import { db } from "./database/db";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// routes
+app.use("/api", publicRoutes);
+app.use("/api/admin", adminRoutes);
+
+// DB health check (temporary)
+app.get("/db-health", async (_req, res) => {
+  try {
+    const conn = await db.getConnection();
+    await conn.ping();
+    conn.release();
+
+    res.json({
+      status: "OK",
+      message: "Database connected",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "ERROR",
+      message: "Database connection failed",
+      error: err,
+    });
+  }
+});
+
+export default app;
+import { errorHandler } from "./middlewares/error.middleware";
+
+app.use(errorHandler);
