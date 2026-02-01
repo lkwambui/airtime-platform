@@ -2,7 +2,7 @@ export default function Transactions() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm font-medium text-slate-500">Payments</p>
+        <p className="text-sm font-medium text-slate-700">Activity</p>
         <h2 className="text-2xl font-semibold text-slate-900">Transactions</h2>
       </div>
 

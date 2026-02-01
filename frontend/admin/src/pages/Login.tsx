@@ -33,7 +33,7 @@ export default function Login() {
           <h1 className="mt-6 text-4xl font-semibold leading-tight text-slate-900">
             Manage airtime sales, settings, and transactions with confidence.
           </h1>
-          <p className="mt-4 text-base text-slate-600">
+          <p className="mt-4 text-base text-slate-800">
             Secure access for administrators. Track performance, update rates, and
             review activity in real-time.
           </p>
@@ -42,7 +42,7 @@ export default function Login() {
         <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Welcome back</p>
+              <p className="text-sm font-medium text-slate-700">Welcome back</p>
               <h2 className="mt-1 text-2xl font-semibold text-slate-900">
                 Sign in to Admin
               </h2>
@@ -54,7 +54,7 @@ export default function Login() {
 
           <div className="mt-8 space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-600">Username</label>
+              <label className="text-sm font-medium text-slate-800">Username</label>
               <input
                 className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
                 placeholder="admin"
@@ -63,7 +63,7 @@ export default function Login() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-600">Password</label>
+              <label className="text-sm font-medium text-slate-800">Password</label>
               <input
                 type="password"
                 className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
@@ -86,7 +86,7 @@ export default function Login() {
             </button>
           </div>
 
-          <p className="mt-6 text-center text-xs text-slate-500">
+          <p className="mt-6 text-center text-xs text-slate-700">
             Use your admin credentials to access the dashboard.
           </p>
         </div>

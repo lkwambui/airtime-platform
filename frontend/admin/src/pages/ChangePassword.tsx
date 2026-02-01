@@ -2,7 +2,7 @@ export default function ChangePassword() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm font-medium text-slate-500">Security</p>
+        <p className="text-sm font-medium text-slate-700">Account</p>
         <h2 className="text-2xl font-semibold text-slate-900">Change Password</h2>
       </div>
 

@@ -22,13 +22,13 @@ export default function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm font-medium text-slate-500">Configuration</p>
+        <p className="text-sm font-medium text-slate-700">Configuration</p>
         <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <label className="text-sm font-medium text-slate-600">Airtime Rate</label>
+          <label className="text-sm font-medium text-slate-800">Airtime Rate</label>
           <div className="mt-3 flex items-center gap-3">
             <input
               type="number"
@@ -36,21 +36,21 @@ export default function Settings() {
               onChange={(e) => setRate(Number(e.target.value))}
               className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
             />
-            <span className="text-sm text-slate-500">KES</span>
+            <span className="text-sm text-slate-800">KES</span>
           </div>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-slate-700">
             Update the rate used for airtime conversions.
           </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <label className="text-sm font-medium text-slate-600">Airtime Stock</label>
+          <label className="text-sm font-medium text-slate-800">Airtime Stock</label>
           <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
             <div>
               <p className="text-sm font-medium text-slate-700">
                 {inStock ? "In Stock" : "Out of Stock"}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-700">
                 Toggle availability for customers.
               </p>
             </div>
