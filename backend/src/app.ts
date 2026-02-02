@@ -14,6 +14,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Root status endpoint
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", message: "Airtime Platform API" });
+});
+
 // routes
 app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
