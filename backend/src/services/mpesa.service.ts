@@ -2,7 +2,7 @@ import axios from "axios";
 import moment from "moment";
 
 const MPESA_BASE_URL =
-  process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke";
+  process.env.MPESA_BASE_URL || "https://api.safaricom.co.ke";
 
 function requireEnv(key: string) {
   const value = process.env[key];
