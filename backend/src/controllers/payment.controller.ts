@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { stkPush } from "../services/mpesa.service";
 import { db } from "../database/db";
 import { calculateAirtime } from "../utils/calculator";
+import { logError, logInfo } from "../utils/logger";
 
 export async function initiatePayment(req: Request, res: Response) {
   try {
     const { payerPhone, receiverPhone, amount } = req.body;
+
+    logInfo("Payment initiation request", { payerPhone, receiverPhone, amount });
 
     if (!payerPhone || !receiverPhone || !amount) {
       return res.status(400).json({
@@ -32,17 +35,22 @@ export async function initiatePayment(req: Request, res: Response) {
 
     const txId = transactionId;
 
+    logInfo("Transaction created", { txId });
+
     // send STK push
-    await stkPush(payerPhone, amount, `TX-${txId}`);
+    const stkResponse = await stkPush(payerPhone, amount, `TX-${txId}`);
+
+    logInfo("STK Push response", stkResponse);
 
     res.json({
       message: "STK Push sent",
       transactionId: txId,
     });
   } catch (error) {
+    logError("Payment initiation failed", error);
     res.status(500).json({
       message: "Payment initiation failed",
-      error,
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 }
