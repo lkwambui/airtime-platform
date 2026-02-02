@@ -5,6 +5,8 @@ import express from "express";
 import cors from "cors";
 import publicRoutes from "./routes/public.routes";
 import adminRoutes from "./routes/admin.routes";
+import paymentRoutes from "./routes/payment.routes";
+import mpesaRoutes from "./routes/mpesa.routes";
 import { db } from "./database/db";
 
 const app = express();
@@ -15,6 +17,8 @@ app.use(express.json());
 // routes
 app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/mpesa", mpesaRoutes);
 
 // DB health check (temporary)
 app.get("/db-health", async (_req: express.Request, res: express.Response) => {

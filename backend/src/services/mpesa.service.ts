@@ -1,11 +1,22 @@
 import axios from "axios";
 import moment from "moment";
 
-const MPESA_BASE_URL = "https://sandbox.safaricom.co.ke";
+const MPESA_BASE_URL =
+  process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke";
+
+function requireEnv(key: string) {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Missing required env var: ${key}`);
+  }
+  return value;
+}
 
 export async function getAccessToken() {
+  const consumerKey = requireEnv("MPESA_CONSUMER_KEY");
+  const consumerSecret = requireEnv("MPESA_CONSUMER_SECRET");
   const auth = Buffer.from(
-    `${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`,
+    `${consumerKey}:${consumerSecret}`,
   ).toString("base64");
 
   const response = await axios.get(
@@ -25,25 +36,28 @@ export async function stkPush(
   amount: number,
   reference: string,
 ) {
+  const shortcode = requireEnv("MPESA_SHORTCODE");
+  const passkey = requireEnv("MPESA_PASSKEY");
+  const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
   const token = await getAccessToken();
   const timestamp = moment().format("YYYYMMDDHHmmss");
 
   const password = Buffer.from(
-    `${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`,
+    `${shortcode}${passkey}${timestamp}`,
   ).toString("base64");
 
   const response = await axios.post(
     `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
     {
-      BusinessShortCode: process.env.MPESA_SHORTCODE,
+      BusinessShortCode: shortcode,
       Password: password,
       Timestamp: timestamp,
       TransactionType: "CustomerPayBillOnline",
       Amount: amount,
       PartyA: phone,
-      PartyB: process.env.MPESA_SHORTCODE,
+      PartyB: shortcode,
       PhoneNumber: phone,
-      CallBackURL: process.env.MPESA_CALLBACK_URL,
+      CallBackURL: callbackUrl,
       AccountReference: reference,
       TransactionDesc: "Airtime purchase",
     },
