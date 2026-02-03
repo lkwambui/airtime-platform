@@ -14,19 +14,30 @@ export async function mpesaCallback(req: Request, res: Response) {
       return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
 
-    const accountRef = cb.AccountReference;
-    if (!accountRef) {
-      logError("Missing AccountReference in callback", cb);
+    const checkoutRequestId = cb.CheckoutRequestID;
+    if (!checkoutRequestId) {
+      logError("Missing CheckoutRequestID in callback", cb);
       return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
 
-    const txId = accountRef.replace("TX-", "");
+    // Find transaction by checkout_request_id
+    const txResult = await db.query(
+      "SELECT id FROM transactions WHERE checkout_request_id=$1 LIMIT 1",
+      [checkoutRequestId]
+    );
+
+    if (!txResult.rows.length) {
+      logError("Transaction not found for checkout request", checkoutRequestId);
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    }
+
+    const txId = txResult.rows[0].id;
 
     if (cb.ResultCode === 0) {
       // Payment successful
       await db.query(
-        "UPDATE transactions SET status='SUCCESS' WHERE id=$1",
-        [txId]
+        "UPDATE transactions SET status='SUCCESS', mpesa_reference=$1 WHERE id=$2",
+        [cb.MerchantRequestID, txId]
       );
 
       const result = await db.query(

@@ -42,6 +42,14 @@ export async function initiatePayment(req: Request, res: Response) {
 
     logInfo("STK Push response", stkResponse);
 
+    // Update transaction with CheckoutRequestID
+    if (stkResponse.CheckoutRequestID) {
+      await db.query(
+        "UPDATE transactions SET checkout_request_id=$1 WHERE id=$2",
+        [stkResponse.CheckoutRequestID, txId]
+      );
+    }
+
     res.json({
       message: "STK Push sent",
       transactionId: txId,

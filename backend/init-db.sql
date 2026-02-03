@@ -33,5 +33,6 @@ CREATE TABLE IF NOT EXISTS transactions (
   rate_used DECIMAL(5,2) NOT NULL,
   status transaction_status DEFAULT 'PENDING',
   mpesa_reference VARCHAR(100),
+  checkout_request_id VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
