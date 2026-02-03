@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import api from "../services/api";
 import { useTheme } from "../context/ThemeContext";
 
@@ -40,7 +41,15 @@ export default function Home() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 4000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Transaction failed");
+      if (axios.isAxiosError(err)) {
+        setError(
+          (err.response?.data as { message?: string } | undefined)?.message ||
+            err.message ||
+            "Transaction failed",
+        );
+      } else {
+        setError(err instanceof Error ? err.message : "Transaction failed");
+      }
     } finally {
       setLoading(false);
     }
