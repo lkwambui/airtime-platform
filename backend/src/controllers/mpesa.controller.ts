@@ -4,75 +4,121 @@ import { sendAirtime } from "../services/airtime.service";
 import { logInfo, logError } from "../utils/logger";
 
 export async function mpesaCallback(req: Request, res: Response) {
-  // log every callback (VERY IMPORTANT)
+  // Always log raw callback
   logInfo("MPESA callback received", req.body);
 
   try {
-    const cb = req.body.Body.stkCallback;
+    const cb = req.body?.Body?.stkCallback;
 
-    // Safaricom sometimes sends unexpected payloads
+    // Safety: unexpected payloads
     if (!cb) {
       logError("Invalid MPESA callback payload", req.body);
       return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
 
-    const ref = cb.AccountReference?.replace("TX-", "");
+    const checkoutId = cb.CheckoutRequestID;
 
-    if (!ref) {
-      logError("Missing AccountReference in callback", cb);
-      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
-    }
-
-    if (cb.ResultCode === 0) {
-      // payment success
-      await db.query("UPDATE transactions SET status='SUCCESS' WHERE id=$1", [
-        ref,
-      ]);
-
-      const txResult = await db.query(
-        "SELECT receiver_phone, airtime_value FROM transactions WHERE id=$1",
-        [ref],
-      );
-
-      const tx = txResult.rows[0];
-
-      if (!tx) {
-        logError("Transaction not found after payment success", ref);
-        return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
-      }
-
-      // send airtime
-      await sendAirtime(tx.receiver_phone, tx.airtime_value);
-
+    /**
+     * 🔴 PAYMENT FAILED / CANCELLED / TIMEOUT
+     * NOTE:
+     * - AccountReference is NOT sent here
+     * - CallbackMetadata is NOT sent here
+     * - This is NORMAL behaviour
+     */
+    if (cb.ResultCode !== 0) {
       await db.query(
-        "UPDATE transactions SET status='AIRTIME_SENT' WHERE id=$1",
-        [ref],
+        `UPDATE transactions
+         SET status = 'FAILED',
+             failure_reason = $1
+         WHERE checkout_request_id = $2`,
+        [cb.ResultDesc, checkoutId]
       );
-
-      logInfo("Airtime sent successfully", {
-        transactionId: ref,
-        phone: tx.receiver_phone,
-        amount: tx.airtime_value,
-      });
-    } else {
-      // payment failed or cancelled
-      await db.query("UPDATE transactions SET status='FAILED' WHERE id=$1", [
-        ref,
-      ]);
 
       logInfo("MPESA payment failed", {
-        transactionId: ref,
+        checkoutId,
         resultCode: cb.ResultCode,
         resultDesc: cb.ResultDesc,
       });
+
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
 
-    // ALWAYS acknowledge Safaricom
-    res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    /**
+     * 🟢 PAYMENT SUCCESS
+     * Only here does Safaricom send metadata
+     */
+    const metadata = cb.CallbackMetadata?.Item || [];
+
+    const accountRef = metadata.find(
+      (i: any) => i.Name === "AccountReference"
+    )?.Value;
+
+    const receipt = metadata.find(
+      (i: any) => i.Name === "MpesaReceiptNumber"
+    )?.Value;
+
+    const amount = metadata.find(
+      (i: any) => i.Name === "Amount"
+    )?.Value;
+
+    if (!accountRef || !receipt) {
+      logError("Missing metadata on successful callback", metadata);
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    }
+
+    // Extract internal transaction ID
+    const txId = accountRef.replace("TX-", "");
+
+    // Mark transaction as PAID
+    await db.query(
+      `UPDATE transactions
+       SET status = 'PAID',
+           mpesa_receipt = $1,
+           amount_paid = $2
+       WHERE id = $3`,
+      [receipt, amount, txId]
+    );
+
+    // Fetch airtime details
+    const txResult = await db.query(
+      `SELECT receiver_phone, airtime_value
+       FROM transactions
+       WHERE id = $1`,
+      [txId]
+    );
+
+    const tx = txResult.rows[0];
+
+    if (!tx) {
+      logError("Transaction not found after payment success", txId);
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    }
+
+    /**
+     * 🚀 SEND AIRTIME
+     * This happens ONLY after confirmed payment
+     */
+    await sendAirtime(tx.receiver_phone, tx.airtime_value);
+
+    await db.query(
+      `UPDATE transactions
+       SET status = 'AIRTIME_SENT'
+       WHERE id = $1`,
+      [txId]
+    );
+
+    logInfo("Airtime sent successfully", {
+      transactionId: txId,
+      phone: tx.receiver_phone,
+      amount: tx.airtime_value,
+    });
+
+    return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
   } catch (error) {
     logError("MPESA callback processing error", error);
 
-    // Even on error, always return success to Safaricom
-    res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    // IMPORTANT:
+    // Even on error, always respond 200 to Safaricom
+    return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
   }
 }
