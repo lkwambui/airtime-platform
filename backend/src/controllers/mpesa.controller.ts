@@ -14,68 +14,55 @@ export async function mpesaCallback(req: Request, res: Response) {
       return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
 
-    const checkoutRequestId = cb.CheckoutRequestID;
-    if (!checkoutRequestId) {
-      logError("Missing CheckoutRequestID in callback", cb);
-      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
-    }
-
-    // Find transaction by checkout_request_id
-    const txResult = await db.query(
-      "SELECT id FROM transactions WHERE checkout_request_id=$1 LIMIT 1",
-      [checkoutRequestId]
-    );
-
-    if (!txResult.rows.length) {
-      logError("Transaction not found for checkout request", checkoutRequestId);
-      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
-    }
-
-    const txId = txResult.rows[0].id;
-
-    if (cb.ResultCode === 0) {
-      // Payment successful
-      await db.query(
-        "UPDATE transactions SET status='SUCCESS', mpesa_reference=$1 WHERE id=$2",
-        [cb.MerchantRequestID, txId]
-      );
-
-      const result = await db.query(
-        "SELECT receiver_phone, airtime_value FROM transactions WHERE id=$1",
-        [txId]
-      );
-
-      const tx = result.rows[0];
-      if (!tx) {
-        logError("Transaction not found", txId);
-        return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
-      }
-
-      await sendAirtime(tx.receiver_phone, tx.airtime_value);
-
-      await db.query(
-        "UPDATE transactions SET status='AIRTIME_SENT' WHERE id=$1",
-        [txId]
-      );
-
-      logInfo("Airtime sent", {
-        txId,
-        phone: tx.receiver_phone,
-        amount: tx.airtime_value,
-      });
-    } else {
-      // Payment failed
-      await db.query(
-        "UPDATE transactions SET status='FAILED' WHERE id=$1",
-        [txId]
-      );
-
-      logInfo("Payment failed", {
-        txId,
+    // On failure, M-Pesa doesn't send AccountReference
+    if (cb.ResultCode !== 0) {
+      logInfo("Payment failed/cancelled", {
         code: cb.ResultCode,
         desc: cb.ResultDesc,
       });
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
+
+    // On success, get AccountReference from metadata
+    const metadata = cb.CallbackMetadata?.Item || [];
+    const accountRef = metadata.find((i: any) => i.Name === "AccountReference")?.Value;
+
+    if (!accountRef) {
+      logError("Missing AccountReference in successful callback", cb);
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    }
+
+    const txId = accountRef.replace("TX-", "");
+
+    // Payment successful
+    await db.query(
+      "UPDATE transactions SET status='SUCCESS', mpesa_reference=$1 WHERE id=$2",
+      [cb.MerchantRequestID, txId]
+    );
+
+    const result = await db.query(
+      "SELECT receiver_phone, airtime_value FROM transactions WHERE id=$1",
+      [txId]
+    );
+
+    const tx = result.rows[0];
+    if (!tx) {
+      logError("Transaction not found", txId);
+      return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    }
+
+    await sendAirtime(tx.receiver_phone, tx.airtime_value);
+
+    await db.query(
+      "UPDATE transactions SET status='SUCCESS' WHERE id=$1",
+      [txId]
+    );
+
+    logInfo("Airtime sent", {
+      txId,
+      phone: tx.receiver_phone,
+      amount: tx.airtime_value,
+    });
 
     return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
   } catch (error) {
