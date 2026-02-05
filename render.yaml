@@ -23,7 +23,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: MPESA_BASE_URL
-        value: https://sandbox.safaricom.co.ke
+        value: https://api.safaricom.co.ke
       - key: MPESA_CONSUMER_KEY
         sync: false
       - key: MPESA_CONSUMER_SECRET
