@@ -1,17 +1,9 @@
 import axios from "axios";
 import moment from "moment";
 
-/**
- * Base URL
- * Production: https://api.safaricom.co.ke
- * Sandbox:    https://sandbox.safaricom.co.ke
- */
 const MPESA_BASE_URL =
   process.env.MPESA_BASE_URL || "https://api.safaricom.co.ke";
 
-/**
- * Ensure required env variables exist
- */
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value) {
@@ -28,7 +20,7 @@ export async function getAccessToken(): Promise<string> {
   const consumerSecret = requireEnv("MPESA_CONSUMER_SECRET");
 
   const auth = Buffer.from(
-    `${consumerKey}:${consumerSecret}`,
+    `${consumerKey}:${consumerSecret}`
   ).toString("base64");
 
   const response = await axios.get(
@@ -37,26 +29,21 @@ export async function getAccessToken(): Promise<string> {
       headers: {
         Authorization: `Basic ${auth}`,
       },
-    },
+    }
   );
-
-  if (!response.data?.access_token) {
-    throw new Error("❌ Failed to obtain MPESA access token");
-  }
 
   return response.data.access_token;
 }
 
 /**
- * Initiate STK Push (BUY GOODS / TILL NUMBER)
+ * Initiate STK Push (BUY GOODS)
  */
 export async function stkPush(
   phone: string,
   amount: number,
-  reference: string,
+  reference: string
 ) {
-  const shortcode =
-    process.env.MPESA_STORE_NUMBER || requireEnv("MPESA_TILL_NUMBER");
+  const shortcode = requireEnv("MPESA_SHORTCODE"); // TILL NUMBER
   const passkey = requireEnv("MPESA_PASSKEY");
   const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
 
@@ -64,7 +51,7 @@ export async function stkPush(
   const timestamp = moment().format("YYYYMMDDHHmmss");
 
   const password = Buffer.from(
-    `${shortcode}${passkey}${timestamp}`,
+    `${shortcode}${passkey}${timestamp}`
   ).toString("base64");
 
   const payload = {
@@ -72,18 +59,18 @@ export async function stkPush(
     Password: password,
     Timestamp: timestamp,
 
-    // ✅ BUY GOODS (NOT PayBill)
+    // 🔴 THIS MUST MATCH YOUR TILL TYPE
     TransactionType: "CustomerBuyGoodsOnline",
 
     Amount: amount,
-    PartyA: phone,      // Customer phone
-    PartyB: shortcode,  // Till Number
+    PartyA: phone,
+    PartyB: shortcode,
     PhoneNumber: phone,
 
     CallBackURL: callbackUrl,
 
-    // MUST be present (used in callback)
-    AccountReference: reference,
+    // REQUIRED
+    AccountReference: `TX-${reference}`,
     TransactionDesc: "Airtime purchase",
   };
 
@@ -95,7 +82,7 @@ export async function stkPush(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    },
+    }
   );
 
   return response.data;
