@@ -4,6 +4,24 @@ import { db } from "../database/db";
 import { calculateAirtime } from "../utils/calculator";
 import { logError, logInfo } from "../utils/logger";
 
+function normalizeKenyanPhone(phone: string): string | null {
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.startsWith("254") && digits.length === 12) {
+    return digits;
+  }
+
+  if (digits.startsWith("0") && digits.length === 10) {
+    return `254${digits.slice(1)}`;
+  }
+
+  if ((digits.startsWith("7") || digits.startsWith("1")) && digits.length === 9) {
+    return `254${digits}`;
+  }
+
+  return null;
+}
+
 export async function initiatePayment(req: Request, res: Response) {
   try {
     const { payerPhone, receiverPhone, amount } = req.body;
@@ -13,6 +31,15 @@ export async function initiatePayment(req: Request, res: Response) {
     if (!payerPhone || !receiverPhone || !amount) {
       return res.status(400).json({
         message: "Missing required fields",
+      });
+    }
+
+    const normalizedPayerPhone = normalizeKenyanPhone(payerPhone);
+    const normalizedReceiverPhone = normalizeKenyanPhone(receiverPhone);
+
+    if (!normalizedPayerPhone || !normalizedReceiverPhone) {
+      return res.status(400).json({
+        message: "Invalid phone number format. Use 2547XXXXXXXX or 07XXXXXXXX.",
       });
     }
 
@@ -29,7 +56,7 @@ export async function initiatePayment(req: Request, res: Response) {
        (payer_phone, receiver_phone, amount_paid, airtime_value, rate_used)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [payerPhone, receiverPhone, amount, airtime, rate],
+      [normalizedPayerPhone, normalizedReceiverPhone, amount, airtime, rate],
     );
     const transactionId = txResult.rows[0].id;
 
@@ -38,7 +65,7 @@ export async function initiatePayment(req: Request, res: Response) {
     logInfo("Transaction created", { txId });
 
     // send STK push
-    const stkResponse = await stkPush(payerPhone, amount, `TX-${txId}`);
+    const stkResponse = await stkPush(normalizedPayerPhone, amount, `TX-${txId}`);
 
     logInfo("STK Push response", stkResponse);
 
