@@ -30,6 +30,8 @@ services:
         sync: false
       - key: MPESA_TILL_NUMBER
         sync: false
+      - key: MPESA_STORE_NUMBER
+        sync: false
       - key: MPESA_PASSKEY
         sync: false
       - key: MPESA_CALLBACK_URL

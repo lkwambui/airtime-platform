@@ -55,7 +55,8 @@ export async function stkPush(
   amount: number,
   reference: string,
 ) {
-  const shortcode = requireEnv("MPESA_TILL_NUMBER"); // ✅ TILL NUMBER
+  const shortcode =
+    process.env.MPESA_STORE_NUMBER || requireEnv("MPESA_TILL_NUMBER");
   const passkey = requireEnv("MPESA_PASSKEY");
   const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
 
