@@ -15,6 +15,7 @@ function requireEnv(key: string) {
 export async function getAccessToken() {
   const consumerKey = requireEnv("MPESA_CONSUMER_KEY");
   const consumerSecret = requireEnv("MPESA_CONSUMER_SECRET");
+
   const auth = Buffer.from(
     `${consumerKey}:${consumerSecret}`,
   ).toString("base64");
@@ -36,31 +37,34 @@ export async function stkPush(
   amount: number,
   reference: string,
 ) {
-  const shortcode = requireEnv("MPESA_SHORTCODE");
+  const tillNumber = requireEnv("MPESA_TILL_NUMBER");
   const passkey = requireEnv("MPESA_PASSKEY");
   const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
+
   const token = await getAccessToken();
   const timestamp = moment().format("YYYYMMDDHHmmss");
 
   const password = Buffer.from(
-    `${shortcode}${passkey}${timestamp}`,
+    `${tillNumber}${passkey}${timestamp}`,
   ).toString("base64");
+
+  const payload = {
+    BusinessShortCode: tillNumber,
+    Password: password,
+    Timestamp: timestamp,
+    TransactionType: "CustomerBuyGoodsOnline", 
+    Amount: amount,
+    PartyA: phone,
+    PartyB: tillNumber,                        
+    PhoneNumber: phone,
+    CallBackURL: callbackUrl,
+    AccountReference: reference,
+    TransactionDesc: "Airtime purchase",
+  };
 
   const response = await axios.post(
     `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
-    {
-      BusinessShortCode: shortcode,
-      Password: password,
-      Timestamp: timestamp,
-      TransactionType: "CustomerPayBillOnline",
-      Amount: amount,
-      PartyA: phone,
-      PartyB: shortcode,
-      PhoneNumber: phone,
-      CallBackURL: callbackUrl,
-      AccountReference: reference,
-      TransactionDesc: "Airtime purchase",
-    },
+    payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
