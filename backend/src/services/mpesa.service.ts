@@ -1,9 +1,15 @@
 import axios from "axios";
 import moment from "moment";
 
+/**
+ * Safaricom production base URL
+ */
 const MPESA_BASE_URL =
   process.env.MPESA_BASE_URL || "https://api.safaricom.co.ke";
 
+/**
+ * Ensure required env variables exist
+ */
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value) {
@@ -13,7 +19,7 @@ function requireEnv(key: string): string {
 }
 
 /**
- * Get OAuth access token
+ * Get OAuth access token from Safaricom
  */
 export async function getAccessToken(): Promise<string> {
   const consumerKey = requireEnv("MPESA_CONSUMER_KEY");
@@ -36,14 +42,15 @@ export async function getAccessToken(): Promise<string> {
 }
 
 /**
- * Initiate STK Push (BUY GOODS)
+ * SEND STK PUSH (BUY GOODS / TILL NUMBER)
+ * This is what makes the popup appear on the phone
  */
 export async function stkPush(
   phone: string,
   amount: number,
   reference: string
 ) {
-  const shortcode = requireEnv("MPESA_SHORTCODE"); // TILL NUMBER
+  const shortcode = requireEnv("MPESA_SHORTCODE"); // ✅ YOUR TILL NUMBER
   const passkey = requireEnv("MPESA_PASSKEY");
   const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
 
@@ -54,22 +61,30 @@ export async function stkPush(
     `${shortcode}${passkey}${timestamp}`
   ).toString("base64");
 
+  /**
+   * 🔴 VERY IMPORTANT
+   * Phone must be in format: 2547XXXXXXXX
+   */
+  const formattedPhone = phone
+    .replace(/^0/, "254")
+    .replace(/^\+/, "");
+
   const payload = {
     BusinessShortCode: shortcode,
     Password: password,
     Timestamp: timestamp,
 
-    // 🔴 THIS MUST MATCH YOUR TILL TYPE
+    // ✅ FOR TILL NUMBERS
     TransactionType: "CustomerBuyGoodsOnline",
 
     Amount: amount,
-    PartyA: phone,
-    PartyB: shortcode,
-    PhoneNumber: phone,
+    PartyA: formattedPhone, // customer phone
+    PartyB: shortcode,       // your till number
+    PhoneNumber: formattedPhone,
 
     CallBackURL: callbackUrl,
 
-    // REQUIRED
+    // Optional but useful for tracking
     AccountReference: `TX-${reference}`,
     TransactionDesc: "Airtime purchase",
   };
