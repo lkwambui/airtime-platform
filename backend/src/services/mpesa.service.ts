@@ -5,22 +5,18 @@ import moment from "moment";
  * Safaricom production base URL
  */
 const MPESA_BASE_URL =
-  process.env.MPESA_BASE_URL || "https://api.safaricom.co.ke";
+  process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke";
 
 /**
  * Ensure required env variables exist
  */
 function requireEnv(key: string): string {
   const value = process.env[key];
-  if (!value) {
-    throw new Error(`❌ Missing required env var: ${key}`);
-  }
+  if (!value) throw new Error(`Missing env var: ${key}`);
   return value;
 }
 
-/**
- * Get OAuth access token from Safaricom
- */
+// 🔑 Get sandbox access token
 export async function getAccessToken(): Promise<string> {
   const consumerKey = requireEnv("MPESA_CONSUMER_KEY");
   const consumerSecret = requireEnv("MPESA_CONSUMER_SECRET");
@@ -41,16 +37,13 @@ export async function getAccessToken(): Promise<string> {
   return response.data.access_token;
 }
 
-/**
- * SEND STK PUSH (BUY GOODS / TILL NUMBER)
- * This is what makes the popup appear on the phone
- */
+// 🧪 SANDBOX STK PUSH
 export async function stkPush(
   phone: string,
   amount: number,
   reference: string
 ) {
-  const shortcode = requireEnv("MPESA_SHORTCODE"); // ✅ YOUR TILL NUMBER
+  const shortcode = requireEnv("MPESA_SHORTCODE");
   const passkey = requireEnv("MPESA_PASSKEY");
   const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
 
@@ -74,8 +67,7 @@ export async function stkPush(
     Password: password,
     Timestamp: timestamp,
 
-    // ✅ FOR TILL NUMBERS
-    TransactionType: "CustomerBuyGoodsOnline",
+    TransactionType: "CustomerPayBillOnline", // SANDBOX ONLY
 
     Amount: amount,
     PartyA: formattedPhone, // customer phone
@@ -83,10 +75,8 @@ export async function stkPush(
     PhoneNumber: formattedPhone,
 
     CallBackURL: callbackUrl,
-
-    // Optional but useful for tracking
-    AccountReference: `TX-${reference}`,
-    TransactionDesc: "Airtime purchase",
+    AccountReference: reference,
+    TransactionDesc: "Sandbox Test",
   };
 
   const response = await axios.post(

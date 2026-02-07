@@ -28,9 +28,22 @@ export async function initiatePayment(req: Request, res: Response) {
 
     logInfo("Payment initiation request", { payerPhone, receiverPhone, amount });
 
-    if (!payerPhone || !receiverPhone || !amount) {
+    if (!payerPhone || !receiverPhone || amount === undefined || amount === null) {
       return res.status(400).json({
         message: "Missing required fields",
+      });
+    }
+
+    const amountValue = Number(amount);
+    if (!Number.isFinite(amountValue) || amountValue <= 0) {
+      return res.status(400).json({
+        message: "Invalid amount",
+      });
+    }
+
+    if (!Number.isInteger(amountValue)) {
+      return res.status(400).json({
+        message: "Amount must be a whole number",
       });
     }
 
@@ -48,7 +61,7 @@ export async function initiatePayment(req: Request, res: Response) {
     const rate = rateResult.rows[0].rate;
 
     // calculate airtime
-    const airtime = calculateAirtime(amount, rate);
+    const airtime = calculateAirtime(amountValue, rate);
 
     // save transaction
     const txResult = await db.query(
@@ -56,7 +69,7 @@ export async function initiatePayment(req: Request, res: Response) {
        (payer_phone, receiver_phone, amount_paid, airtime_value, rate_used)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [normalizedPayerPhone, normalizedReceiverPhone, amount, airtime, rate],
+      [normalizedPayerPhone, normalizedReceiverPhone, amountValue, airtime, rate],
     );
     const transactionId = txResult.rows[0].id;
 
@@ -65,7 +78,7 @@ export async function initiatePayment(req: Request, res: Response) {
     logInfo("Transaction created", { txId });
 
     // send STK push
-    const stkResponse = await stkPush(normalizedPayerPhone, amount, `TX-${txId}`);
+    const stkResponse = await stkPush(normalizedPayerPhone, amountValue, String(txId));
 
     logInfo("STK Push response", stkResponse);
 
