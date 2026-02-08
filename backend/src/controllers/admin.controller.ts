@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { authenticateAdmin } from "../services/auth.service";
+import { logError } from "../utils/logger";
 
 export async function adminLogin(req: Request, res: Response) {
   const { username, password } = req.body;
@@ -22,6 +23,11 @@ export async function adminLogin(req: Request, res: Response) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    res.status(500).json({ message: "Admin login failed" });
+    logError("Admin login failed", error);
+
+    res.status(500).json({
+      message: "Admin login failed",
+      error: process.env.NODE_ENV === "production" ? undefined : error?.message,
+    });
   }
 }

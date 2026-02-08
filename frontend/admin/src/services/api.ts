@@ -19,7 +19,7 @@ function resolveBaseUrl() {
       throw new Error("VITE_API_BASE_URL is not set");
     }
 
-    return "https://airtime-backend.onrender.com/api";
+    return "http://localhost:4000/api";
   }
 
   return raw.replace(/\/+$/, "");
