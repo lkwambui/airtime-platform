@@ -1,8 +1,32 @@
 import axios, { InternalAxiosRequestConfig } from "axios";
 
+interface ImportMetaEnv {
+  readonly VITE_API_BASE_URL?: string;
+  readonly PROD: boolean;
+}
+
+declare global {
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
+function resolveBaseUrl() {
+  const raw = import.meta.env.VITE_API_BASE_URL;
+
+  if (!raw) {
+    if (import.meta.env.PROD) {
+      throw new Error("VITE_API_BASE_URL is not set");
+    }
+
+    return "https://airtime-backend.onrender.com/api";
+  }
+
+  return raw.replace(/\/+$/, "");
+}
+
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api",
+  baseURL: resolveBaseUrl(),
 });
 
 api.interceptors.request.use(
