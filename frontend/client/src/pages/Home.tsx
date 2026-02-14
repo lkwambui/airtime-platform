@@ -56,25 +56,25 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-linear-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-linear-to-br from-gray-50 via-white to-gray-50'} flex justify-center items-center px-4 py-6 md:py-12`}>
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-slate-950' : 'bg-gray-50'} flex justify-center items-center px-2 py-6 md:py-12`}>
+      <div className="w-full max-w-4xl flex flex-col md:flex-row gap-8 items-center md:items-start">
         {/* Why Buy Section - Left Side on desktop, Below on mobile */}
-        <div className="w-full lg:w-1/3 lg:sticky lg:top-8 order-2 lg:order-1">
+        <div className="w-full md:w-1/2 md:sticky md:top-8 order-2 md:order-1">
           <WhyBuy />
         </div>
 
         {/* Main Form Section - Right Side on desktop, Above on mobile */}
-        <div className={`w-full lg:w-2/3 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white/80'} backdrop-blur-xl rounded-3xl ${theme === 'dark' ? 'border border-slate-700/50' : 'border border-gray-200/50'} shadow-2xl p-8 space-y-6 hover:shadow-2xl transition-shadow duration-300 order-1 lg:order-2`}>
+        <div className={`w-full max-w-md mx-auto ${theme === 'dark' ? 'bg-slate-900/80' : 'bg-white/90'} backdrop-blur-xl rounded-2xl ${theme === 'dark' ? 'border border-slate-800/60' : 'border border-gray-200/70'} shadow-xl p-6 md:p-8 space-y-6 order-1 md:order-2 transition-shadow duration-300`}>
           <Header />
 
           {success && (
-            <div className={`${theme === 'dark' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'} border rounded-xl p-4 text-sm font-medium animate-fade-in`}>
+            <div className={`${theme === 'dark' ? 'bg-emerald-600/20 border-emerald-600/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700'} border rounded-lg p-3 text-sm font-medium animate-fade-in`}>
               ✓ STK Push sent successfully! Check your phone.
             </div>
           )}
 
           {error && (
-            <div className={`${theme === 'dark' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl p-4 text-sm font-medium`}>
+            <div className={`${theme === 'dark' ? 'bg-red-600/20 border-red-600/40 text-red-300' : 'bg-red-50 border-red-200 text-red-700'} border rounded-lg p-3 text-sm font-medium`}>
               ✕ {error}
             </div>
           )}
@@ -95,7 +95,7 @@ export default function Home() {
               loading={loading}
             />
           ) : (
-            <div className={`${theme === 'dark' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-red-50 border-red-200 text-red-700'} border rounded-xl p-4 text-center font-semibold`}>
+            <div className={`${theme === 'dark' ? 'bg-red-600/20 border-red-600/40 text-red-300' : 'bg-red-50 border-red-200 text-red-700'} border rounded-lg p-3 text-center font-semibold`}>
               Airtime is currently out of stock. Please check again later.
             </div>
           )}

@@ -20,48 +20,48 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <p className="text-sm font-medium text-slate-700">Configuration</p>
-        <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
+        <p className="text-xs font-semibold text-cyan-700 tracking-widest uppercase">Configuration</p>
+        <h2 className="text-2xl font-bold text-slate-900">Settings</h2>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <label className="text-sm font-medium text-slate-800">Airtime Rate</label>
-          <div className="mt-3 flex items-center gap-3">
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="rounded-xl border border-slate-100 bg-white/90 p-6 shadow-sm">
+          <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Airtime Rate</label>
+          <div className="mt-3 flex items-center gap-2">
             <input
               type="number"
               value={rate}
               onChange={(e) => setRate(Number(e.target.value))}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
             />
-            <span className="text-sm text-slate-800">KES</span>
+            <span className="text-xs text-slate-500">KES</span>
           </div>
-          <p className="mt-2 text-xs text-slate-700">
+          <p className="mt-2 text-xs text-slate-500">
             Update the rate used for airtime conversions.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <label className="text-sm font-medium text-slate-800">Airtime Stock</label>
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
+        <div className="rounded-xl border border-slate-100 bg-white/90 p-6 shadow-sm">
+          <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Airtime Stock</label>
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2">
             <div>
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-xs font-semibold text-slate-700">
                 {inStock ? "In Stock" : "Out of Stock"}
               </p>
-              <p className="text-xs text-slate-700">
+              <p className="text-xs text-slate-500">
                 Toggle availability for customers.
               </p>
             </div>
             <button
               onClick={() => setInStock((prev) => !prev)}
-              className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
-                inStock ? "bg-brand-600" : "bg-slate-300"
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                inStock ? "bg-cyan-600" : "bg-slate-300"
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
                   inStock ? "translate-x-6" : "translate-x-1"
                 }`}
               />
@@ -70,13 +70,15 @@ export default function Settings() {
         </div>
       </div>
 
-      <button
-        onClick={save}
-        disabled={saving}
-        className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-brand-300"
-      >
-        {saving ? "Saving..." : "Save Changes"}
-      </button>
+      <div className="flex justify-end">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="rounded-lg bg-cyan-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 disabled:bg-slate-400"
+        >
+          {saving ? "Saving..." : "Save Settings"}
+        </button>
+      </div>
     </div>
   );
 }
