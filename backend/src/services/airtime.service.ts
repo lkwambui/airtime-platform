@@ -5,6 +5,8 @@ const BASE_URL =
   process.env.AUTOBUNDLES_BASE_URL?.replace(/\/$/, "") ||
   "https://api.autobundles.co.ke";
 
+const TOKEN_PATH = process.env.AUTOBUNDLES_TOKEN_PATH || "/oauth/token";
+
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value) {
@@ -26,7 +28,7 @@ async function getAccessToken(): Promise<string> {
     const clientSecret = requireEnv("AUTOBUNDLES_CLIENT_SECRET");
 
     const response = await axios.post(
-      `${BASE_URL}/oauth/token`,
+      `${BASE_URL}${TOKEN_PATH.startsWith("/") ? TOKEN_PATH : `/${TOKEN_PATH}`}`,
       {
         grant_type: "client_credentials",
         client_id: clientId,
@@ -48,7 +50,12 @@ async function getAccessToken(): Promise<string> {
 
     return token;
   } catch (error: any) {
-    logError("AutoBundles token error", error?.response?.data || error.message);
+    logError("AutoBundles token error", {
+      status: error?.response?.status,
+      data: error?.response?.data || error?.message,
+      tokenPath: TOKEN_PATH,
+      baseUrl: BASE_URL,
+    });
     throw error;
   }
 }

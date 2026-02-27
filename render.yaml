@@ -28,13 +28,23 @@ services:
         sync: false
       - key: MPESA_CONSUMER_SECRET
         sync: false
-      - key: MPESA_TILL_NUMBER
+      - key: MPESA_SHORTCODE
         sync: false
-      - key: MPESA_STORE_NUMBER
+      - key: MPESA_TILL
         sync: false
+      - key: MPESA_TRANSACTION_TYPE
+        value: CustomerBuyGoodsOnline
       - key: MPESA_PASSKEY
         sync: false
       - key: MPESA_CALLBACK_URL
+        sync: false
+      - key: AUTOBUNDLES_BASE_URL
+        value: https://api.autobundles.co.ke
+      - key: AUTOBUNDLES_TOKEN_PATH
+        value: /oauth/token
+      - key: AUTOBUNDLES_CLIENT_ID
+        sync: false
+      - key: AUTOBUNDLES_CLIENT_SECRET
         sync: false
     healthCheckPath: /db-health
 

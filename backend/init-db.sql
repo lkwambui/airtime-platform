@@ -21,7 +21,13 @@ VALUES (1, 0.85, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Create transaction status enum
-CREATE TYPE IF NOT EXISTS transaction_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
+CREATE TYPE IF NOT EXISTS transaction_status AS ENUM (
+  'PENDING',
+  'SUCCESS',
+  'FAILED',
+  'AIRTIME_SENT',
+  'AIRTIME_FAILED'
+);
 
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
