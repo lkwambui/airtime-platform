@@ -51,6 +51,11 @@ export async function stkPush(
   const till = requireEnv("MPESA_TILL");           // 3703823
   const passkey = requireEnv("MPESA_PASSKEY");
   const callbackUrl = requireEnv("MPESA_CALLBACK_URL");
+  const transactionType =
+    process.env.MPESA_TRANSACTION_TYPE ||
+    (MPESA_BASE_URL.includes("sandbox")
+      ? "CustomerPayBillOnline"
+      : "CustomerBuyGoodsOnline");
 
   const token = await getAccessToken();
   const timestamp = moment().format("YYYYMMDDHHmmss");
@@ -71,11 +76,11 @@ export async function stkPush(
     Password: password,
     Timestamp: timestamp,
 
-    TransactionType: "CustomerBuyGoodsOnline", 
+    TransactionType: transactionType,
 
     Amount: amount,
     PartyA: formattedPhone,               
-    PartyB: till,                         
+    PartyB: transactionType === "CustomerBuyGoodsOnline" ? till : shortcode,
     PhoneNumber: formattedPhone,
 
     CallBackURL: callbackUrl,
