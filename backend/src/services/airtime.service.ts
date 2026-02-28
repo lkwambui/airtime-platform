@@ -5,7 +5,8 @@ const BASE_URL =
   process.env.AUTOBUNDLES_BASE_URL?.replace(/\/$/, "") ||
   "https://api.autobundles.co.ke";
 
-const TOKEN_PATH = process.env.AUTOBUNDLES_TOKEN_PATH || "/oauth/token";
+const TOKEN_PATH = process.env.AUTOBUNDLES_TOKEN_PATH || "/seller-api-auth";
+const ORDERS_PATH = process.env.AUTOBUNDLES_ORDERS_PATH || "/seller-api-orders";
 
 function requireEnv(key: string): string {
   const value = process.env[key];
@@ -73,10 +74,11 @@ export async function sendAirtime(recipientPhone: string, amount: number) {
     });
 
     const response = await axios.post(
-      `${BASE_URL}/api/v1/orders`,
+      `${BASE_URL}${ORDERS_PATH.startsWith("/") ? ORDERS_PATH : `/${ORDERS_PATH}`}`,
       {
-        recipient_phone: formattedPhone,
         amount: airtimeAmount,
+        buyer_phone: formattedPhone,
+        recipient_phone: formattedPhone,
       },
       {
         timeout: 20000,

@@ -41,7 +41,9 @@ services:
       - key: AUTOBUNDLES_BASE_URL
         value: https://api.autobundles.co.ke
       - key: AUTOBUNDLES_TOKEN_PATH
-        value: /oauth/token
+        value: /seller-api-auth
+      - key: AUTOBUNDLES_ORDERS_PATH
+        value: /seller-api-orders
       - key: AUTOBUNDLES_CLIENT_ID
         sync: false
       - key: AUTOBUNDLES_CLIENT_SECRET
