@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Root status endpoint
 app.get("/", (_req, res) => {
-  res.json({ status: "ok", message: "Airtime Platform API" });
+  res.json({ status: "ok", message: "Okoa ChapChap API" });
 });
 
 // routes

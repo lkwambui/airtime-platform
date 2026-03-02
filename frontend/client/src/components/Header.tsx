@@ -32,7 +32,7 @@ export default function Header() {
         </div>
       </div>
       <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-        Loveline Airtime
+        Okoa ChapChap
       </h1>
       <p className="text-sm text-slate-600 dark:text-slate-300 tracking-wide font-semibold">FAST • SECURE • INSTANT</p>
     </header>

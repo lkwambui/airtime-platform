@@ -1,4 +1,4 @@
-# Airtime Platform
+# Okoa ChapChap
 
 Admin airtime sales platform with M-Pesa integration.
 

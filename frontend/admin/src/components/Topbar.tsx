@@ -7,7 +7,7 @@ export default function Topbar() {
     <header className="border-b border-slate-100 bg-white/80 shadow-sm">
       <div className="container-screen flex items-center justify-between py-3">
         <div>
-          <p className="text-xs font-semibold text-cyan-700 tracking-widest uppercase">Airtime Platform</p>
+          <p className="text-xs font-semibold text-cyan-700 tracking-widest uppercase">Okoa ChapChap</p>
           <h1 className="text-lg font-bold text-slate-900">Admin Dashboard</h1>
         </div>
         <button
