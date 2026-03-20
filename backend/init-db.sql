@@ -20,15 +20,6 @@ INSERT INTO settings (id, rate, in_stock)
 VALUES (1, 0.85, true)
 ON CONFLICT (id) DO NOTHING;
 
--- Create transaction status enum
-CREATE TYPE IF NOT EXISTS transaction_status AS ENUM (
-  'PENDING',
-  'SUCCESS',
-  'FAILED',
-  'AIRTIME_SENT',
-  'AIRTIME_FAILED'
-);
-
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
   id BIGSERIAL PRIMARY KEY,
@@ -37,8 +28,22 @@ CREATE TABLE IF NOT EXISTS transactions (
   amount_paid DECIMAL(10,2) NOT NULL,
   airtime_value DECIMAL(10,2) NOT NULL,
   rate_used DECIMAL(5,2) NOT NULL,
-  status transaction_status DEFAULT 'PENDING',
+  status TEXT DEFAULT 'PENDING',
   mpesa_reference VARCHAR(100),
   checkout_request_id VARCHAR(100),
+  assigned_device TEXT,
+  balance_before NUMERIC,
+  balance_after NUMERIC,
+  retried_by TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS devices (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  status TEXT,
+  enabled BOOLEAN,
+  battery INTEGER,
+  charging BOOLEAN,
+  last_seen TIMESTAMP
 );

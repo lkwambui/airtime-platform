@@ -57,14 +57,14 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-slate-950' : 'bg-gray-50'} flex justify-center items-center px-2 py-6 md:py-12`}>
-      <div className="w-full max-w-4xl flex flex-col md:flex-row gap-8 items-center md:items-start">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-center md:items-start">
         {/* Why Buy Section - Left Side on desktop, Below on mobile */}
-        <div className="w-full md:w-1/2 md:sticky md:top-8 order-2 md:order-1">
+        <div className="w-full md:w-[55%] lg:w-[58%] md:sticky md:top-8 order-2 md:order-1">
           <WhyBuy />
         </div>
 
         {/* Main Form Section - Right Side on desktop, Above on mobile */}
-        <div className={`w-full max-w-md mx-auto ${theme === 'dark' ? 'bg-slate-900/80' : 'bg-white/90'} backdrop-blur-xl rounded-2xl ${theme === 'dark' ? 'border border-slate-800/60' : 'border border-gray-200/70'} shadow-xl p-6 md:p-8 space-y-6 order-1 md:order-2 transition-shadow duration-300`}>
+        <div className={`w-full md:w-[45%] lg:w-[42%] max-w-md mx-auto ${theme === 'dark' ? 'bg-slate-900/80' : 'bg-white/90'} backdrop-blur-xl rounded-2xl ${theme === 'dark' ? 'border border-slate-800/60' : 'border border-gray-200/70'} shadow-xl p-6 md:p-8 space-y-6 order-1 md:order-2 transition-shadow duration-300`}>
           <Header />
 
           {success && (

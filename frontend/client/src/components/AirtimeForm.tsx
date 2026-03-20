@@ -74,7 +74,7 @@ export default function AirtimeForm({ mode, loading, onSubmit }: Props) {
           </>
         ) : (
           <>
-            <span>💳</span> Buy Airtime
+            <span>�</span> Buy Airtime
           </>
         )}
       </button>
