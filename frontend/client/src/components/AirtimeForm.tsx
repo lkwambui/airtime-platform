@@ -62,7 +62,9 @@ export default function AirtimeForm({ mode, loading, onSubmit }: Props) {
       <button
         type="submit"
         disabled={!isFormValid || loading}
-        className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-slate-500 text-white font-semibold py-2 rounded-lg transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-base disabled:cursor-not-allowed"
+        className="w-full bg-cyan-600 hover:bg-cyan-700 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 disabled:bg-slate-500 text-white font-semibold py-2 rounded-lg transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-base disabled:cursor-not-allowed"
+        aria-busy={loading}
+        aria-label="Buy Airtime"
       >
         {loading ? (
           <>

@@ -9,8 +9,9 @@ export default function Header() {
         <div />
         <button
           onClick={toggleTheme}
-          className="p-2.5 rounded-lg bg-slate-700/30 dark:bg-slate-700/30 border border-slate-600/30 hover:border-slate-500/50 transition-all duration-300"
+          className="p-2.5 rounded-lg bg-slate-700/30 dark:bg-slate-700/30 border border-slate-600/30 hover:border-slate-500/50 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 transition-all duration-300"
           title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         >
           {theme === "dark" ? (
             <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
@@ -32,7 +33,7 @@ export default function Header() {
         </div>
       </div>
       <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-        Okoa ChapChap
+        Kredo ChapChap
       </h1>
       <p className="text-sm text-slate-600 dark:text-slate-300 tracking-wide font-semibold">FAST • SECURE • INSTANT</p>
     </header>
