@@ -13,14 +13,19 @@ import WhyBuy from "../components/WhyBuy";
 
 export default function Home() {
   const { theme } = useTheme();
+
   const [rate, setRate] = useState(0);
   const [inStock, setInStock] = useState(true);
   const [mode, setMode] = useState<BuyMode>("SELF");
+
+  // 🔥 THIS controls live preview
   const [amount, setAmount] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Fetch rate + stock
   useEffect(() => {
     api.get("/settings").then((res) => {
       setRate(res.data.rate);
@@ -28,6 +33,7 @@ export default function Home() {
     });
   }, []);
 
+  // Submit payment
   const submit = async (data: {
     payerPhone: string;
     receiverPhone: string;
@@ -35,9 +41,10 @@ export default function Home() {
   }) => {
     setLoading(true);
     setError(null);
+
     try {
-      setAmount(data.amount);
       await api.post("/payments/pay", data);
+
       setSuccess(true);
       setTimeout(() => setSuccess(false), 4000);
     } catch (err) {
@@ -45,7 +52,7 @@ export default function Home() {
         setError(
           (err.response?.data as { message?: string } | undefined)?.message ||
             err.message ||
-            "Transaction failed",
+            "Transaction failed"
         );
       } else {
         setError(err instanceof Error ? err.message : "Transaction failed");
@@ -56,46 +63,89 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-slate-950' : 'bg-gray-50'} flex justify-center items-center px-2 py-6 md:py-12`}>
+    <div
+      className={`min-h-screen ${
+        theme === "dark" ? "bg-slate-950" : "bg-gray-50"
+      } flex justify-center items-center px-2 py-6 md:py-12`}
+    >
       <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-center md:items-start">
-        {/* Why Buy Section - Left Side on desktop, Below on mobile */}
+        
+        {/* LEFT SIDE */}
         <div className="w-full md:w-[55%] lg:w-[58%] md:sticky md:top-8 order-2 md:order-1">
           <WhyBuy />
         </div>
 
-        {/* Main Form Section - Right Side on desktop, Above on mobile */}
-        <div className={`w-full md:w-[45%] lg:w-[42%] max-w-md mx-auto ${theme === 'dark' ? 'bg-slate-900/80' : 'bg-white/90'} backdrop-blur-xl rounded-2xl ${theme === 'dark' ? 'border border-slate-800/60' : 'border border-gray-200/70'} shadow-xl p-6 md:p-8 space-y-6 order-1 md:order-2 transition-shadow duration-300`}>
+        {/* RIGHT SIDE (MAIN CARD) */}
+        <div
+          className={`w-full md:w-[45%] lg:w-[42%] max-w-md mx-auto ${
+            theme === "dark" ? "bg-slate-900/80" : "bg-white/90"
+          } backdrop-blur-xl rounded-2xl ${
+            theme === "dark"
+              ? "border border-slate-800/60"
+              : "border border-gray-200/70"
+          } shadow-xl p-6 md:p-8 space-y-6 order-1 md:order-2 transition-shadow duration-300`}
+        >
           <Header />
 
+          {/* SUCCESS */}
           {success && (
-            <div className={`${theme === 'dark' ? 'bg-emerald-600/20 border-emerald-600/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700'} border rounded-lg p-3 text-sm font-medium animate-fade-in`}>
+            <div
+              className={`${
+                theme === "dark"
+                  ? "bg-emerald-600/20 border-emerald-600/40 text-emerald-300"
+                  : "bg-emerald-50 border-emerald-200 text-emerald-700"
+              } border rounded-lg p-3 text-sm font-medium`}
+            >
               ✓ STK Push sent successfully! Check your phone.
             </div>
           )}
 
+          {/* ERROR */}
           {error && (
-            <div className={`${theme === 'dark' ? 'bg-red-600/20 border-red-600/40 text-red-300' : 'bg-red-50 border-red-200 text-red-700'} border rounded-lg p-3 text-sm font-medium`}>
+            <div
+              className={`${
+                theme === "dark"
+                  ? "bg-red-600/20 border-red-600/40 text-red-300"
+                  : "bg-red-50 border-red-200 text-red-700"
+              } border rounded-lg p-3 text-sm font-medium`}
+            >
               ✕ {error}
             </div>
           )}
 
+          {/* RATE */}
           <RateDisplay rate={rate} inStock={inStock} />
 
+          {/* MODE */}
           <BuyModeToggle mode={mode} onChange={setMode} />
 
+          {/* 🔥 LIVE PREVIEW */}
           <AirtimePreview amount={amount} rate={rate} />
 
+          {/* FORM */}
           {inStock ? (
             <AirtimeForm
               mode={mode}
+              loading={loading}
+
+              // 🔥 LIVE UPDATE FROM INPUT
+              onAmountChange={(value) => {
+                setAmount(value);
+              }}
+
+              // SUBMIT
               onSubmit={(data) => {
-                setAmount(data.amount);
                 submit(data);
               }}
-              loading={loading}
             />
           ) : (
-            <div className={`${theme === 'dark' ? 'bg-red-600/20 border-red-600/40 text-red-300' : 'bg-red-50 border-red-200 text-red-700'} border rounded-lg p-3 text-center font-semibold`}>
+            <div
+              className={`${
+                theme === "dark"
+                  ? "bg-red-600/20 border-red-600/40 text-red-300"
+                  : "bg-red-50 border-red-200 text-red-700"
+              } border rounded-lg p-3 text-center font-semibold`}
+            >
               Airtime is currently out of stock. Please check again later.
             </div>
           )}

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../database/db";
-import { sendAirtime } from "../services/airtime.service";
+import { createAirtimeJob } from "../services/airtime.service";
 import { logInfo, logError } from "../utils/logger";
 
 export async function mpesaCallback(req: Request, res: Response) {
@@ -9,7 +9,7 @@ export async function mpesaCallback(req: Request, res: Response) {
   try {
     const callback = req.body?.Body?.stkCallback;
 
-    // Always acknowledge Safaricom first
+    // ✅ Always acknowledge Safaricom immediately
     res.json({ ResultCode: 0, ResultDesc: "Accepted" });
 
     if (!callback) {
@@ -39,39 +39,38 @@ export async function mpesaCallback(req: Request, res: Response) {
     const tx = txResult.rows[0];
     const transactionId = tx.id;
 
+    // ✅ PAYMENT SUCCESS
     if (resultCode === 0) {
       logInfo("Payment successful", {
         transactionId,
         checkoutRequestId,
       });
 
-      await db.query(
-        "UPDATE transactions SET status=$1 WHERE id=$2",
-        ["SUCCESS", transactionId]
-      );
-
       try {
-        await sendAirtime(tx.receiver_phone, tx.airtime_value);
-
-        await db.query(
-          "UPDATE transactions SET status=$1 WHERE id=$2",
-          ["AIRTIME_SENT", transactionId]
+        // 🔥 IMPORTANT: create job instead of sending airtime
+        await createAirtimeJob(
+          transactionId,
+          tx.receiver_phone,
+          tx.airtime_value
         );
 
-        logInfo("Airtime sent successfully", {
+        logInfo("Airtime job created", {
           transactionId,
           phone: tx.receiver_phone,
           amount: tx.airtime_value,
         });
-      } catch (airtimeError) {
-        logError("Airtime sending failed", airtimeError);
+      } catch (jobError) {
+        logError("Failed to create airtime job", jobError);
 
         await db.query(
           "UPDATE transactions SET status=$1 WHERE id=$2",
-          ["AIRTIME_FAILED", transactionId]
+          ["FAILED", transactionId]
         );
       }
-    } else {
+    }
+
+    // ❌ PAYMENT FAILED / CANCELLED
+    else {
       logInfo("Payment failed or cancelled", {
         transactionId,
         resultCode,

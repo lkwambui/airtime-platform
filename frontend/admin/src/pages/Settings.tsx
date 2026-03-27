@@ -7,7 +7,7 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.get("/settings").then((res) => {
+    api.get("/settings").then((res: any) => {
       setRate(res.data.rate);
       setInStock(res.data.inStock);
     });

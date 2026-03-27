@@ -1,50 +1,57 @@
 import { db } from "../database/db";
-import { sendAirtime } from "../services/airtime.service";
 import { logInfo, logError } from "../utils/logger";
 
 /**
- * Retry airtime for successful payments
- * that did not complete airtime delivery
+ * Auto-handle stuck airtime jobs
  */
 export async function retryAirtimeJobs() {
   try {
-    const result = await db.query(
-      `SELECT id, receiver_phone, airtime_value
-       FROM transactions
-       WHERE status = 'SUCCESS'`,
-    );
+    // 🔥 1. Mark long-waiting jobs as FAILED (no SMS / no result)
+    const failedResult = await db.query(`
+      UPDATE transactions
+      SET status = 'FAILED', updated_at = NOW()
+      WHERE status = 'WAITING_ETOPUP'
+      AND updated_at < NOW() - INTERVAL '20 minutes'
+      RETURNING id, receiver_phone
+    `);
 
-    const transactions = result.rows;
+    if (failedResult.rows.length > 0) {
+      logInfo("Marked transactions as FAILED", failedResult.rows);
+    } else {
+      logInfo("No stuck airtime jobs found");
+    }
 
-    if (transactions.length === 0) {
-      logInfo("No airtime retries pending");
+    // 🔥 2. Try re-assign jobs that were waiting for device
+    const device = await db.query(`
+      SELECT name FROM devices
+      WHERE status='ONLINE' AND enabled=true
+      LIMIT 1
+    `);
+
+    if (device.rows.length === 0) {
+      logInfo("No available device for reassignment");
       return;
     }
 
-    for (const tx of transactions) {
-      try {
-        logInfo("Retrying airtime", {
-          transactionId: tx.id,
-          phone: tx.receiver_phone,
-        });
+    const deviceName = device.rows[0].name;
 
-        await sendAirtime(tx.receiver_phone, tx.airtime_value);
+    const reassigned = await db.query(`
+      UPDATE transactions
+      SET 
+        status = 'WAITING_ETOPUP',
+        assigned_device = $1,
+        updated_at = NOW()
+      WHERE status = 'WAITING_DEVICE'
+      RETURNING id
+    `, [deviceName]);
 
-        await db.query(
-          "UPDATE transactions SET status = 'AIRTIME_SENT' WHERE id = ?",
-          [tx.id],
-        );
-
-        logInfo("Airtime retry successful", {
-          transactionId: tx.id,
-        });
-      } catch (err) {
-        logError("Airtime retry failed", {
-          transactionId: tx.id,
-          error: err,
-        });
-      }
+    if (reassigned.rows.length > 0) {
+      logInfo("Reassigned transactions to device", {
+        device: deviceName,
+        count: reassigned.rows.length,
+      });
     }
+
   } catch (error) {
     logError("Airtime retry job error", error);
   }
