@@ -1,4 +1,4 @@
-# Okoa ChapChap
+# Kredo ChapChap
 
 Admin airtime sales platform with M-Pesa integration.
 

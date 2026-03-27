@@ -39,21 +39,21 @@ function WhyBuy() {
     <section
       className={`${
         theme === "dark"
-          ? "bg-linear-to-br from-cyan-900/30 via-blue-900/20 to-slate-900/40 border-cyan-800/50"
-          : "bg-linear-to-br from-cyan-50 via-blue-50 to-white border-cyan-200"
+          ? "bg-gradient-to-br from-slate-900 via-gray-800 to-gray-900 border-gray-700"
+          : "bg-gradient-to-br from-gray-100 via-gray-200 to-white border-gray-400"
       } backdrop-blur-xl border rounded-3xl shadow-xl p-6 md:p-8 transition-all duration-300`}
     >
       <div className="space-y-2 text-center">
         <p
           className={`text-xs font-semibold uppercase tracking-[0.18em] ${
-            theme === "dark" ? "text-cyan-300" : "text-cyan-700"
+            theme === "dark" ? "text-gray-300" : "text-gray-700"
           }`}
         >
-          Why Choose Okoa ChapChap
+          Why Choose Kredo ChapChap
         </p>
         <h2
           className={`text-2xl md:text-3xl font-bold leading-tight ${
-            theme === "dark" ? "text-slate-100" : "text-slate-900"
+            theme === "dark" ? "text-white" : "text-gray-900"
           }`}
         >
           Better rates, faster airtime, zero guesswork.
@@ -66,13 +66,13 @@ function WhyBuy() {
             key={benefit.title}
             className={`${
               theme === "dark"
-                ? "bg-slate-900/50 border-slate-700/60"
-                : "bg-white/90 border-slate-200"
+                ? "bg-gray-900 border-gray-700"
+                : "bg-white border-gray-300"
             } border rounded-2xl p-4 md:p-5 flex items-start gap-3 md:gap-4`}
           >
             <span
               className={`${
-                theme === "dark" ? "bg-cyan-500/20" : "bg-cyan-100"
+                theme === "dark" ? "bg-gray-700/30" : "bg-gray-200"
               } w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-base md:text-lg shrink-0`}
             >
               {benefit.icon}
@@ -80,14 +80,14 @@ function WhyBuy() {
             <div className="space-y-1">
               <h3
                 className={`text-sm font-semibold ${
-                  theme === "dark" ? "text-slate-100" : "text-slate-900"
+                  theme === "dark" ? "text-white" : "text-gray-900"
                 } md:text-base`}
               >
                 {benefit.title}
               </h3>
               <p
                 className={`text-xs leading-relaxed ${
-                  theme === "dark" ? "text-slate-300" : "text-slate-600"
+                  theme === "dark" ? "text-gray-300" : "text-gray-700"
                 } md:text-sm`}
               >
                 {benefit.description}
@@ -100,8 +100,8 @@ function WhyBuy() {
       <div
         className={`mt-5 rounded-2xl px-4 py-3 text-sm font-medium text-center ${
           theme === "dark"
-            ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
-            : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            ? "bg-gray-800 text-gray-200 border border-gray-600"
+            : "bg-gray-100 text-gray-800 border border-gray-400"
         }`}
       >
         Trusted checkout with M-PESA • Transparent totals before payment

@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Root status endpoint
 app.get("/", (_req, res) => {
-  res.json({ status: "ok", message: "Okoa ChapChap API" });
+  res.json({ status: "ok", message: "Kredo ChapChap API" });
 });
 
 // routes
