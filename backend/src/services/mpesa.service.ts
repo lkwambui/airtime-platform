@@ -1,5 +1,21 @@
+
 import axios from "axios";
 import moment from "moment";
+
+// Types for MPESA responses
+export interface StkPushResponse {
+  MerchantRequestID?: string;
+  CheckoutRequestID?: string;
+  ResponseCode?: string;
+  ResponseDescription?: string;
+  CustomerMessage?: string;
+  [key: string]: any;
+}
+
+interface AccessTokenResponse {
+  access_token: string;
+  expires_in: string;
+}
 
 /**
  * Safaricom PRODUCTION base URL
@@ -27,7 +43,7 @@ export async function getAccessToken(): Promise<string> {
     `${consumerKey}:${consumerSecret}`
   ).toString("base64");
 
-  const response = await axios.get(
+  const response = await axios.get<AccessTokenResponse>(
     `${MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials`,
     {
       headers: {
@@ -35,7 +51,6 @@ export async function getAccessToken(): Promise<string> {
       },
     }
   );
-
   return response.data.access_token;
 }
 
@@ -46,7 +61,7 @@ export async function stkPush(
   phone: string,
   amount: number,
   reference: string
-) {
+): Promise<StkPushResponse> {
   const shortcode = requireEnv("MPESA_SHORTCODE"); // 3703725
   const till = requireEnv("MPESA_TILL");           // 3703823
   const passkey = requireEnv("MPESA_PASSKEY");
@@ -88,7 +103,7 @@ export async function stkPush(
     TransactionDesc: "Airtime purchase",
   };
 
-  const response = await axios.post(
+  const response = await axios.post<StkPushResponse>(
     `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
     payload,
     {
@@ -98,6 +113,5 @@ export async function stkPush(
       },
     }
   );
-
   return response.data;
 }
