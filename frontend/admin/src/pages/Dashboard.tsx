@@ -18,7 +18,7 @@ export default function Dashboard() {
   });
 
   const fetchData = async () => {
-    const res = await api.get("/admin/transactions");
+    const res = await api.get("/transactions");
     const tx = res.data;
 
     // Group by day

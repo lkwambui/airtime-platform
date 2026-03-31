@@ -18,7 +18,7 @@ export default function Transactions() {
   const [search, setSearch] = useState("");
 
   const fetchTransactions = async () => {
-    const res = await api.get("/admin/transactions");
+    const res = await api.get("/transactions");
     setTransactions(res.data);
     setFiltered(res.data);
   };
