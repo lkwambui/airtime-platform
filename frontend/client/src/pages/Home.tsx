@@ -27,7 +27,7 @@ export default function Home() {
       }, 1000);
       return () => clearInterval(interval);
     }, []);
-  // ...existing code...
+  const [amount, setAmount] = useState(0); // required for AirtimeForm onAmountChange
 
   const [rate, setRate] = useState(0);
   const [inStock, setInStock] = useState(true);
