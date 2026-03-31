@@ -27,7 +27,7 @@ export default function Home() {
       }, 1000);
       return () => clearInterval(interval);
     }, []);
-  const [amount, setAmount] = useState(0); // required for AirtimeForm onAmountChange
+  // Removed unused 'amount' state. Use a no-op for onAmountChange if not needed.
 
   const [rate, setRate] = useState(0);
   const [inStock, setInStock] = useState(true);
@@ -135,7 +135,7 @@ export default function Home() {
               <AirtimeForm
                 mode={mode}
                 loading={loading}
-                onAmountChange={setAmount}
+                onAmountChange={() => {}}
                 onSubmit={submit}
               />
             ) : (
