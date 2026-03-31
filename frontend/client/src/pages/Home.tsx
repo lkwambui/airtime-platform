@@ -11,7 +11,7 @@ function getNairobiTime() {
 }
 import axios from "axios";
 import api from "../services/api";
-import { useTheme } from "../context/ThemeContext";
+// ...existing code...
 
 
 import type { BuyMode } from "../components/BuyModeToggle";
@@ -34,7 +34,7 @@ export default function Home() {
   const [mode] = useState<BuyMode>("SELF");
 
   // 🔥 THIS controls live preview
-  const [amount, setAmount] = useState(0); // used for live preview and form
+  // ...existing code...
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
