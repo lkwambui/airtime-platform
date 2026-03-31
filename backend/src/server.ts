@@ -10,7 +10,7 @@ async function startServer() {
     await db.query("SELECT 1"); // simple DB check
 
     app.listen(PORT, () => {
-      console.log('🚀 Backend running on port ${PORT}');
+      console.log(`🚀 Backend running on port ${PORT}`);
     });
 
     // 🔥 Run background jobs

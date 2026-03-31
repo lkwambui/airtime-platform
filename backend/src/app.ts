@@ -12,6 +12,10 @@ import { db } from "./database/db";
 import { errorHandler } from "./middlewares/error.middleware";
 
 const app = express();
+// Test route to confirm backend is running correct code
+app.get("/test", (_req, res) => {
+  res.json({ status: "test ok" });
+});
 
 app.use(cors());
 app.use(express.json());
