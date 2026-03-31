@@ -24,7 +24,7 @@ export default function AirtimeForm({
   onSubmit,
   onAmountChange, // 🔥 RECEIVE
 }: Props) {
-  const { theme } = useTheme();
+  // ...existing code...
 
 
   const [tab, setTab] = useState<BuyMode>(mode);

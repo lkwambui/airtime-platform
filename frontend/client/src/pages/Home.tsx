@@ -27,14 +27,14 @@ export default function Home() {
       }, 1000);
       return () => clearInterval(interval);
     }, []);
-  const { theme } = useTheme();
+  // ...existing code...
 
   const [rate, setRate] = useState(0);
   const [inStock, setInStock] = useState(true);
-  const [mode, setMode] = useState<BuyMode>("SELF");
+  const [mode] = useState<BuyMode>("SELF");
 
   // 🔥 THIS controls live preview
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(0); // used for live preview and form
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function Home() {
 
         {/* RIGHT: Main Card */}
         <section className="w-full md:w-1/2 flex justify-center items-center">
-          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 space-y-6 border border-gray-200 border-[1px]">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 space-y-6 border border-gray-200">
             <div className="flex flex-col items-center gap-2">
               <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-xs font-semibold text-green-700 mb-2">In Stock • Live Rates</span>
               {/* Today's Rate - Outstanding Style */}
