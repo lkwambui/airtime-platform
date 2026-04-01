@@ -1,16 +1,12 @@
 
 import { useState } from "react";
-// ...existing code...
 
 export type BuyMode = "SELF" | "OTHER";
 
 type Props = {
   mode: BuyMode;
   loading: boolean;
-
-  // 🔥 ADD THIS
   onAmountChange: (amount: number) => void;
-
   onSubmit: (data: {
     payerPhone: string;
     receiverPhone: string;
@@ -22,11 +18,8 @@ export default function AirtimeForm({
   mode,
   loading,
   onSubmit,
-  onAmountChange, // 🔥 RECEIVE
+  onAmountChange,
 }: Props) {
-  // ...existing code...
-
-
   const [tab, setTab] = useState<BuyMode>(mode);
   const [payerPhone, setPayerPhone] = useState("");
   const [receiverPhone, setReceiverPhone] = useState("");
@@ -34,6 +27,8 @@ export default function AirtimeForm({
 
   const isFormValid =
     payerPhone && amount > 0 && (tab === "SELF" || receiverPhone);
+
+  const sanitizePhone = (value: string) => value.replace(/\D/g, "").slice(0, 10);
 
   const handleSubmit = () => {
     onSubmit({
@@ -73,27 +68,36 @@ export default function AirtimeForm({
 
       {/* Phone Number */}
       <div className="relative mb-2">
+        <label htmlFor="payerPhone" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+          M-PESA Number
+        </label>
         <input
+          id="payerPhone"
           type="tel"
-          placeholder="07XX XXX XXX"
+          placeholder="07XXXXXXXX"
           value={payerPhone}
-          onChange={(e) => setPayerPhone(e.target.value)}
+          onChange={(e) => setPayerPhone(sanitizePhone(e.target.value))}
           disabled={loading}
           className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 pl-10 text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm0 8a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2zm8-8a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm0 8a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zm8-8a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm0 8a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
         </span>
+        <p className="mt-1 text-xs text-gray-500">Use your Safaricom number in format 07XXXXXXXX.</p>
       </div>
 
       {/* Recipient Number */}
       {tab === "OTHER" && (
         <div className="relative mb-2">
+          <label htmlFor="receiverPhone" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+            Recipient Number
+          </label>
           <input
+            id="receiverPhone"
             type="tel"
-            placeholder="Recipient Phone Number"
+            placeholder="07XXXXXXXX"
             value={receiverPhone}
-            onChange={(e) => setReceiverPhone(e.target.value)}
+            onChange={(e) => setReceiverPhone(sanitizePhone(e.target.value))}
             disabled={loading}
             className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 pl-10 text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
           />
@@ -105,9 +109,14 @@ export default function AirtimeForm({
 
       {/* Amount */}
       <div className="mb-2">
+        <label htmlFor="amount" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+          Amount (KES)
+        </label>
         <input
+          id="amount"
           type="number"
           placeholder="Enter amount"
+          min={1}
           value={amount || ""}
           onChange={(e) => {
             const value = Math.max(0, Math.floor(Number(e.target.value)));
@@ -117,6 +126,7 @@ export default function AirtimeForm({
           disabled={loading}
           className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
+        <p className="mt-1 text-xs text-gray-500">Only whole numbers are accepted.</p>
       </div>
 
       {/* Quick-select amounts */}
@@ -156,6 +166,9 @@ export default function AirtimeForm({
           </>
         )}
       </button>
+      {!isFormValid && !loading && (
+        <p className="text-center text-xs text-gray-500">Enter valid phone and amount to continue.</p>
+      )}
     </form>
   );
 }
