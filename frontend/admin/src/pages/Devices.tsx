@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-
-type Device = {
-  id: number;
-  name: string;
-  brand: string;
-  battery: number;
-  charging: boolean;
-  status: string;
-  last_seen: string;
-};
+import type { Device } from "../types/device";
 
 export default function Devices() {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -57,15 +48,22 @@ export default function Devices() {
           >
             <div>
               <p className="font-semibold">{d.name}</p>
-              <p className="text-sm text-gray-500">{d.brand}</p>
+              {d.brand && <p className="text-sm text-gray-500">{d.brand}</p>}
               <p className="text-sm">
-                Last Seen: {new Date(d.last_seen).toLocaleString()}
+                Last Seen:{" "}
+                {d.last_seen ? new Date(d.last_seen).toLocaleString() : "—"}
               </p>
             </div>
 
             <div className="text-right space-y-1">
-              <p>🔋 {d.battery}%</p>
-              <p>{d.charging ? "⚡ Charging" : "🔌 Not Charging"}</p>
+              <p>🔋 {d.battery != null ? `${d.battery}%` : "—"}</p>
+              <p>
+                {d.charging == null
+                  ? "—"
+                  : d.charging
+                  ? "⚡ Charging"
+                  : "🔌 Not Charging"}
+              </p>
               <p
                 className={
                   d.status === "ONLINE"
