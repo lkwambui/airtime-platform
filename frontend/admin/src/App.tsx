@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Transactions from "./pages/Transactions";
+import Devices from "./pages/Devices";
 import ChangePassword from "./pages/ChangePassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
@@ -16,8 +17,9 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/devices" element={<Devices />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/change-password" element={<ChangePassword />} />
           </Route>
         </Route>
