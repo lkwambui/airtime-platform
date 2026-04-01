@@ -18,7 +18,7 @@ export default function Transactions() {
   const [search, setSearch] = useState("");
 
   const fetchTransactions = async () => {
-    const res = await api.get("/transactions");
+    const res = await api.get("/admin/transactions");
     setTransactions(res.data);
     setFiltered(res.data);
   };
@@ -51,7 +51,7 @@ export default function Transactions() {
     const pin = prompt("Enter admin PIN");
     if (!pin) return;
 
-    await api.post('/admin/retry/${id}', {
+    await api.post(`/admin/retry/${id}`, {
       pin,
       admin: "admin",
     });
@@ -64,7 +64,7 @@ export default function Transactions() {
     const pin = prompt("Enter admin PIN");
     if (!pin) return;
 
-    await api.post('/admin/force-success/${id}', {
+    await api.post(`/admin/force-success/${id}`, {
       pin,
       admin: "admin",
     });

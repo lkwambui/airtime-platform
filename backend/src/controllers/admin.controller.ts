@@ -229,7 +229,7 @@ export async function getTransactions(req: Request, res: Response) {
 export async function getDevices(req: Request, res: Response) {
   try {
     const result = await db.query(`
-      SELECT id, name, status, battery, charging, enabled
+      SELECT id, name, name AS brand, status, battery, charging, last_seen
       FROM devices
       ORDER BY id DESC
     `);

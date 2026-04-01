@@ -9,6 +9,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const ResponsiveContainerAny = ResponsiveContainer as any;
+const LineChartAny = LineChart as any;
+const XAxisAny = XAxis as any;
+const YAxisAny = YAxis as any;
+const LineAny = Line as any;
+const TooltipAny = Tooltip as any;
+
 export default function Dashboard() {
   const [data, setData] = useState<any[]>([]);
   const [stats, setStats] = useState({
@@ -18,7 +25,7 @@ export default function Dashboard() {
   });
 
   const fetchData = async () => {
-    const res = await api.get("/transactions");
+    const res = await api.get("/admin/transactions");
     const tx = res.data;
 
     // Group by day
@@ -77,14 +84,14 @@ export default function Dashboard() {
       <div className="bg-white p-6 rounded-xl shadow">
         <h3 className="mb-4 font-semibold">Daily Profit</h3>
 
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="profit" />
-          </LineChart>
-        </ResponsiveContainer>
+        <ResponsiveContainerAny width="100%" height={300}>
+          <LineChartAny data={data}>
+            <XAxisAny dataKey="day" />
+            <YAxisAny />
+            <TooltipAny />
+            <LineAny type="monotone" dataKey="profit" />
+          </LineChartAny>
+        </ResponsiveContainerAny>
       </div>
     </div>
   );

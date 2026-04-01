@@ -21,6 +21,9 @@ export default function Sidebar() {
         <NavLink to="/transactions" className={linkClasses}>
           Transactions
         </NavLink>
+        <NavLink to="/devices" className={linkClasses}>
+          Devices
+        </NavLink>
         <NavLink to="/settings" className={linkClasses}>
           Settings
         </NavLink>

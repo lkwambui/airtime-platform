@@ -1,12 +1,26 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
+
+type Device = {
+  id: number;
+  name: string;
+  brand: string;
+  battery: number;
+  charging: boolean;
+  status: string;
+  last_seen: string;
+};
 
 export default function Devices() {
-  const [devices, setDevices] = useState<any[]>([]);
+  const [devices, setDevices] = useState<Device[]>([]);
 
   const fetchDevices = async () => {
-    const res = await api.get("/admin/devices");
-    setDevices(res.data);
+    try {
+      const res = await fetch("http://localhost:4000/api/admin/devices");
+      const data = await res.json();
+      setDevices(data);
+    } catch (err) {
+      console.error("Failed to fetch devices", err);
+    }
   };
 
   useEffect(() => {
@@ -15,27 +29,36 @@ export default function Devices() {
     return () => clearInterval(i);
   }, []);
 
-  const toggle = async (id: number) => {
-    await api.post('/admin/device/toggle/${id}');
-    fetchDevices();
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="p-6 space-y-6">
       <h2 className="text-xl font-bold">Devices</h2>
 
       {devices.map((d) => (
-        <div key={d.id} className="p-4 bg-white rounded-xl shadow flex justify-between">
+        <div
+          key={d.id}
+          className="border rounded-lg p-4 flex justify-between items-center"
+        >
           <div>
-            <p>{d.name}</p>
-            <p className="text-sm text-gray-500">
-              {d.status} | Battery: {d.battery}% {d.charging ? "⚡" : ""}
+            <p className="font-semibold">{d.name}</p>
+            <p className="text-sm text-gray-500">{d.brand}</p>
+            <p className="text-sm">
+              Last Seen: {new Date(d.last_seen).toLocaleString()}
             </p>
           </div>
 
-          <button onClick={() => toggle(d.id)}>
-            {d.enabled ? "Disable" : "Enable"}
-          </button>
+          <div className="text-right space-y-1">
+            <p>🔋 {d.battery}%</p>
+            <p>{d.charging ? "⚡ Charging" : "🔌 Not Charging"}</p>
+            <p
+              className={
+                d.status === "ONLINE"
+                  ? "text-green-600"
+                  : "text-red-500"
+              }
+            >
+              {d.status}
+            </p>
+          </div>
         </div>
       ))}
     </div>
