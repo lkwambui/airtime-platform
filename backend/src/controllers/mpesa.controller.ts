@@ -26,6 +26,7 @@ export async function mpesaCallback(req: Request, res: Response) {
       return;
     }
 
+    // 🔍 Find transaction
     const txResult = await db.query(
       "SELECT * FROM transactions WHERE checkout_request_id=$1",
       [checkoutRequestId]
@@ -47,11 +48,17 @@ export async function mpesaCallback(req: Request, res: Response) {
       });
 
       try {
-        // 🔥 IMPORTANT: create job instead of sending airtime
+        // 🔥 Create job for phone automation
         await createAirtimeJob(
           transactionId,
           tx.receiver_phone,
           tx.airtime_value
+        );
+
+        // ✅🔥 VERY IMPORTANT: UPDATE STATUS TO SUCCESS
+        await db.query(
+          "UPDATE transactions SET status=$1 WHERE id=$2",
+          ["SUCCESS", transactionId]
         );
 
         logInfo("Airtime job created", {
@@ -59,6 +66,7 @@ export async function mpesaCallback(req: Request, res: Response) {
           phone: tx.receiver_phone,
           amount: tx.airtime_value,
         });
+
       } catch (jobError) {
         logError("Failed to create airtime job", jobError);
 
@@ -82,6 +90,7 @@ export async function mpesaCallback(req: Request, res: Response) {
         ["FAILED", transactionId]
       );
     }
+
   } catch (error) {
     logError("MPESA callback error", error);
   }
