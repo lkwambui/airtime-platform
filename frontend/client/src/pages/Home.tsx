@@ -12,8 +12,7 @@ function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
       aria-hidden="true"
     >
       <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M6 4v16" strokeLinecap="round" />
-        <path d="M18 4l-8 8 8 8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   );
