@@ -182,10 +182,10 @@ export default function Home() {
         <section className="mb-7 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-amber-500 md:text-5xl">Buy Airtime</h1>
           <p className="mt-2 text-sm font-medium text-slate-500">Fast, secure, and instant delivery</p>
-          <div className="mt-4 md:hidden">
+          <div className="mt-4">
             <button
               type="button"
-              className="inline-flex w-auto max-w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft"
+              className="inline-flex w-auto max-w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft md:px-5"
             >
               <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
                 <span className="text-base leading-none">%</span>
@@ -225,17 +225,7 @@ export default function Home() {
                   </span>
                   <span>Secure M-PESA STK Push checkout flow.</span>
                 </li>
-                <li>
-                  <button
-                    type="button"
-                    className="hidden w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft ring-1 ring-white/25 md:inline-flex"
-                  >
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
-                      <span className="text-base leading-none">%</span>
-                    </span>
-                    Today&apos;s rate: {settingsLoading ? "..." : `${rate}%`}
-                  </button>
-                </li>
+                
               </ul>
 
               <div className="pointer-events-none absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-white/15" />
