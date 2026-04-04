@@ -182,6 +182,17 @@ export default function Home() {
         <section className="mb-7 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-amber-500 md:text-5xl">Buy Airtime</h1>
           <p className="mt-2 text-sm font-medium text-slate-500">Fast, secure, and instant delivery</p>
+          <div className="mt-4 md:hidden">
+            <button
+              type="button"
+              className="inline-flex w-auto max-w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft"
+            >
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+                <span className="text-base leading-none">%</span>
+              </span>
+              Today&apos;s rate: {settingsLoading ? "..." : `${rate}%`}
+            </button>
+          </div>
           <div className="mt-4 flex justify-center">
             <Badge variant={inStock ? "success" : "danger"} className="px-5 py-2 text-sm shadow-soft">
               {inStock ? "In Stock" : "Out of Stock"}
@@ -217,7 +228,7 @@ export default function Home() {
                 <li>
                   <button
                     type="button"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft ring-1 ring-white/25"
+                    className="hidden w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft ring-1 ring-white/25 md:inline-flex"
                   >
                     <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
                       <span className="text-base leading-none">%</span>
