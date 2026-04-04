@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
+import PageHeader from "../components/ui/PageHeader";
+import PinModal from "../components/PinModal";
 
 type Transaction = {
   id: number;
@@ -11,11 +17,25 @@ type Transaction = {
   assigned_device?: string;
 };
 
+type PendingAction =
+  | { type: "retry"; transactionId: number }
+  | { type: "force"; transactionId: number }
+  | null;
+
+const statusFilters = ["ALL", "SUCCESS", "WAITING_ETOPUP", "FAILED"];
+
+function getStatusBadgeVariant(status: string): "success" | "danger" | "warning" {
+  if (status === "SUCCESS") return "success";
+  if (status === "FAILED") return "danger";
+  return "warning";
+}
+
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filtered, setFiltered] = useState<Transaction[]>([]);
   const [status, setStatus] = useState("ALL");
   const [search, setSearch] = useState("");
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
   const fetchTransactions = async () => {
     const res = await api.get("/admin/transactions");
@@ -25,11 +45,10 @@ export default function Transactions() {
 
   useEffect(() => {
     fetchTransactions();
-    const interval = setInterval(fetchTransactions, 5000); // 🔥 auto refresh
+    const interval = setInterval(fetchTransactions, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // 🔍 Filter logic
   useEffect(() => {
     let data = transactions;
 
@@ -38,148 +57,129 @@ export default function Transactions() {
     }
 
     if (search) {
-      data = data.filter((t) =>
-        t.receiver_phone.includes(search)
-      );
+      data = data.filter((t) => t.receiver_phone.includes(search));
     }
 
     setFiltered(data);
   }, [status, search, transactions]);
 
-  // 🔁 Retry
-  const retry = async (id: number) => {
-    const pin = prompt("Enter admin PIN");
-    if (!pin) return;
+  const confirmAction = async (pin: string) => {
+    if (!pendingAction) return;
 
-    await api.post(`/admin/retry/${id}`, {
-      pin,
-      admin: "admin",
-    });
+    const endpoint =
+      pendingAction.type === "retry"
+        ? `/admin/retry/${pendingAction.transactionId}`
+        : `/admin/force-success/${pendingAction.transactionId}`;
 
-    fetchTransactions();
-  };
-
-  // ✅ Force success
-  const forceSuccess = async (id: number) => {
-    const pin = prompt("Enter admin PIN");
-    if (!pin) return;
-
-    await api.post(`/admin/force-success/${id}`, {
-      pin,
-      admin: "admin",
-    });
-
-    fetchTransactions();
+    await api.post(endpoint, { pin, admin: "admin" });
+    await fetchTransactions();
+    setPendingAction(null);
   };
 
   return (
-    <div className="space-y-6">
-      {/* HEADER */}
-      <div>
-        <p className="text-sm font-medium text-slate-700">Activity</p>
-        <h2 className="text-2xl font-semibold text-slate-900">
-          Transactions
-        </h2>
-      </div>
+    <div className="app-section">
+      <PageHeader
+        eyebrow="Activity"
+        title="Transactions"
+        description="Monitor all payment attempts and trigger administrative recovery actions."
+      />
 
-      {/* FILTERS */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <input
+      <Card className="space-y-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <Input
+            containerClassName="w-full md:max-w-xs"
           placeholder="Search phone..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border px-3 py-2 rounded-lg text-sm"
-        />
+          />
 
-        {["ALL", "SUCCESS", "WAITING_ETOPUP", "FAILED"].map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatus(s)}
-            className={`px-3 py-1 rounded-lg text-xs ${
-              status === s
-                ? "bg-cyan-600 text-white"
-                : "bg-gray-100"
-            }`}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+          <div className="flex flex-wrap gap-2">
+            {statusFilters.map((filter) => (
+              <Button
+                key={filter}
+                variant={status === filter ? "primary" : "secondary"}
+                size="sm"
+                onClick={() => setStatus(filter)}
+              >
+                {filter}
+              </Button>
+            ))}
+          </div>
+        </div>
 
-      {/* TABLE */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 overflow-x-auto">
-        {filtered.length === 0 ? (
-          <p className="text-center text-gray-400">
-            No transactions found
-          </p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500">
-                <th>ID</th>
-                <th>Phone</th>
-                <th>Paid</th>
-                <th>Airtime</th>
-                <th>Status</th>
-                <th>Device</th>
-                <th>Time</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filtered.map((t) => (
-                <tr key={t.id} className="border-t">
-                  <td>{t.id}</td>
-                  <td>{t.receiver_phone}</td>
-                  <td>{t.amount_paid}</td>
-                  <td>{t.airtime_value}</td>
-
-                  <td>
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        t.status === "SUCCESS"
-                          ? "bg-green-100 text-green-700"
-                          : t.status === "FAILED"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {t.status}
-                    </span>
-                  </td>
-
-                  <td>{t.assigned_device || "-"}</td>
-
-                  <td>
-                    {new Date(t.created_at).toLocaleTimeString()}
-                  </td>
-
-                  <td className="flex gap-2">
-                    {t.status !== "SUCCESS" && (
-                      <>
-                        <button
-                          onClick={() => retry(t.id)}
-                          className="text-blue-600 text-xs"
-                        >
-                          Retry
-                        </button>
-
-                        <button
-                          onClick={() => forceSuccess(t.id)}
-                          className="text-green-600 text-xs"
-                        >
-                          Force
-                        </button>
-                      </>
-                    )}
-                  </td>
+        <div className="overflow-x-auto">
+          {filtered.length === 0 ? (
+            <p className="py-12 text-center text-sm text-slate-500">No transactions found.</p>
+          ) : (
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                  <th className="pb-3 pr-4">ID</th>
+                  <th className="pb-3 pr-4">Phone</th>
+                  <th className="pb-3 pr-4">Paid</th>
+                  <th className="pb-3 pr-4">Airtime</th>
+                  <th className="pb-3 pr-4">Status</th>
+                  <th className="pb-3 pr-4">Device</th>
+                  <th className="pb-3 pr-4">Time</th>
+                  <th className="pb-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+
+              <tbody>
+                {filtered.map((t) => (
+                  <tr key={t.id} className="border-b border-slate-100 text-slate-700 transition hover:bg-slate-50/80">
+                    <td className="py-3 pr-4 font-medium text-slate-900">{t.id}</td>
+                    <td className="py-3 pr-4">{t.receiver_phone}</td>
+                    <td className="py-3 pr-4">{t.amount_paid}</td>
+                    <td className="py-3 pr-4">{t.airtime_value}</td>
+                    <td className="py-3 pr-4">
+                      <Badge variant={getStatusBadgeVariant(t.status)}>{t.status}</Badge>
+                    </td>
+                    <td className="py-3 pr-4">{t.assigned_device || "-"}</td>
+                    <td className="py-3 pr-4">{new Date(t.created_at).toLocaleTimeString()}</td>
+                    <td className="py-3">
+                      {t.status !== "SUCCESS" ? (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() =>
+                              setPendingAction({ type: "retry", transactionId: t.id })
+                            }
+                          >
+                            Retry
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              setPendingAction({ type: "force", transactionId: t.id })
+                            }
+                          >
+                            Force
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs font-medium text-slate-400">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </Card>
+
+      <PinModal
+        open={pendingAction !== null}
+        title="Authorize Action"
+        description="Enter your admin PIN to continue."
+        confirmLabel={pendingAction?.type === "retry" ? "Retry Transaction" : "Force Success"}
+        onClose={() => setPendingAction(null)}
+        onConfirm={confirmAction}
+      />
     </div>
   );
 }

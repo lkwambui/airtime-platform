@@ -3,6 +3,78 @@ import axios from "axios";
 import AirtimeForm from "../components/AirtimeForm";
 import { useToast } from "../components/ui/ToastProvider";
 import api from "../services/api";
+import Badge from "../components/ui/Badge";
+
+function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-brand-600 shadow-soft ${className}`}
+      aria-hidden="true"
+    >
+      <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 4v16" strokeLinecap="round" />
+        <path d="M18 4l-8 8 8 8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+
+  );
+}
+
+function PhoneIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.19 19a19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-2.92-8.63A2 2 0 0 1 4.27 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.63 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.36a2 2 0 0 1 2.11-.45c.84.3 1.72.51 2.62.63A2 2 0 0 1 22 16.92z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function MailIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m4 7 8 6 8-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function LocationIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </svg>
+  );
+}
+
+function BoltIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ShieldIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3 5 6v6c0 5 3.4 8 7 9 3.6-1 7-4 7-9V6l-7-3Z" />
+      <path d="m9 12 2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 function getNairobiTime() {
   return new Date().toLocaleTimeString("en-KE", {
@@ -50,6 +122,7 @@ export default function Home() {
 
     fetchSettings();
 
+
     return () => {
       mounted = false;
     };
@@ -86,58 +159,89 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full px-4 py-8 md:py-14">
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Nairobi time: <span className="font-semibold">{nairobiTime}</span>
+    <div className="min-h-screen w-full bg-slate-100 px-4 py-8 md:py-10">
+      <div className="container-screen">
+        <header className="mb-7 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <LogoMark className="h-9 w-9" />
+            <p className="text-2xl font-extrabold tracking-tight">
+              <span className="text-amber-500">Kredo</span>{" "}
+              <span className="text-brand-700">Chapchap</span>
+            </p>
           </div>
-        </div>
+          <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-soft ring-2 ring-white/70 md:px-5 md:py-3">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+              <ClockIcon />
+            </span>
+            <span className="leading-none">
+              Nairobi Time <span className="ml-1 font-bold">{nairobiTime}</span>
+            </span>
+          </div>
+        </header>
 
-        <div className="grid items-start gap-8 md:grid-cols-2 md:gap-12">
-          <section className="rounded-3xl border border-gray-200 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
-            <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold tracking-widest text-blue-700">WHY CHOOSE US</span>
-            <h1 className="mt-4 text-3xl font-extrabold leading-tight text-gray-900 md:text-5xl">Better rates, faster airtime, zero guesswork.</h1>
-            <p className="mt-3 max-w-xl text-base text-gray-600 md:text-lg">Experience a simpler airtime checkout with live stock, transparent totals, and instant M-PESA flow.</p>
+        <section className="mb-7 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-amber-500 md:text-5xl">Buy Airtime</h1>
+          <p className="mt-2 text-sm font-medium text-slate-500">Fast, secure, and instant delivery</p>
+          <div className="mt-4 flex justify-center">
+            <Badge variant={inStock ? "success" : "danger"} className="px-5 py-2 text-sm shadow-soft">
+              {inStock ? "In Stock" : "Out of Stock"}
+            </Badge>
+          </div>
+        </section>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-                <p className="text-xs font-semibold text-emerald-700">TODAY&apos;S RATE</p>
-                <p className="mt-1 text-lg font-bold text-emerald-700">{settingsLoading ? "..." : `${rate}%`}</p>
-              </div>
-              <div className={`rounded-xl border p-3 ${inStock ? "border-blue-200 bg-blue-50" : "border-red-200 bg-red-50"}`}>
-                <p className="text-xs font-semibold text-gray-700">STATUS</p>
-                <p className={`mt-1 text-lg font-bold ${inStock ? "text-blue-700" : "text-red-700"}`}>{inStock ? "In Stock" : "Out of Stock"}</p>
-              </div>
-            </div>
+        <section className="overflow-hidden rounded-2xl border border-white/70 bg-white shadow-soft">
+          <div className="grid lg:grid-cols-[360px_1fr]">
+            <aside className="order-2 relative overflow-hidden bg-[#01263d] p-6 text-white md:p-8 lg:order-1">
+              <h2 className="text-3xl font-bold leading-tight">Why Choose Us</h2>
+              <p className="mt-2 text-sm text-slate-200">Reliable airtime checkout with better value.</p>
 
-            <ul className="mt-6 space-y-4">
-              <li className="text-sm text-gray-700">💸 Better value with regularly updated discounted rates.</li>
-              <li className="text-sm text-gray-700">⚡ Near-instant airtime delivery after successful payment.</li>
-              <li className="text-sm text-gray-700">🔐 Secure M-PESA STK Push checkout flow.</li>
-            </ul>
-          </section>
+              <ul className="mt-8 space-y-4 text-sm text-slate-100">
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
+                    <BoltIcon className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Better value with regularly updated discounted rates.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
+                    <PhoneIcon className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Near-instant airtime delivery after successful payment.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
+                    <ShieldIcon className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Secure M-PESA STK Push checkout flow.</span>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 px-4 py-3 text-sm font-bold text-white shadow-soft ring-1 ring-white/25"
+                  >
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+                      <span className="text-base leading-none">%</span>
+                    </span>
+                    Today&apos;s rate: {settingsLoading ? "..." : `${rate}%`}
+                  </button>
+                </li>
+              </ul>
 
-          <section className="w-full">
-            <div className="w-full rounded-3xl border border-gray-200 bg-white p-6 shadow-xl md:p-8">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Buy Airtime</h2>
-                  <p className="text-sm text-gray-500">Fast, secure, and instant delivery</p>
-                </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${inStock ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                  {inStock ? "In Stock" : "Out of Stock"}
-                </span>
-              </div>
+              <div className="pointer-events-none absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-white/15" />
+              <div className="pointer-events-none absolute bottom-8 right-16 h-28 w-28 rounded-full bg-white/10" />
+            </aside>
 
+            <div className="order-1 p-6 md:p-8 lg:order-2">
               {selectedAmount > 0 && (
-                <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-                  You are about to pay <span className="font-semibold">KES {selectedAmount}</span>.
+                <div className="mb-4 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
+                  You are about to pay <span className="font-semibold">KES {selectedAmount.toLocaleString()}</span>.
                 </div>
               )}
 
               {error && (
-                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">{error}</div>
+                <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+                  {error}
+                </div>
               )}
 
               {inStock ? (
@@ -148,15 +252,48 @@ export default function Home() {
                   onSubmit={submit}
                 />
               ) : (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center font-semibold text-red-700">Airtime is currently out of stock. Please check again later.</div>
+                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-center font-semibold text-rose-700">
+                  Airtime is currently out of stock. Please check again later.
+                </div>
               )}
 
-              <div className="mt-4 text-center text-xs font-medium text-gray-500">
+              <div className="mt-5 text-center text-xs font-medium text-slate-500">
                 Secured by M-PESA • Transparent totals before payment
               </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
+
+        <footer className="mt-10 rounded-2xl bg-[#01263d] px-5 py-8 text-white md:px-8">
+          <div className="flex flex-col items-center justify-center gap-3 border-b border-white/20 pb-5 text-center">
+            <LogoMark className="h-11 w-11" />
+            <p className="text-4xl font-bold tracking-tight">
+              <span className="text-amber-400">Kredo</span>{" "}
+              <span className="text-brand-200">ChapChap</span>
+            </p>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/90">Contact</h3>
+            <div className="mt-3 grid gap-2 md:grid-cols-3">
+              <p className="flex items-center gap-2 text-sm text-white/80"><PhoneIcon /> +254 700 000 000</p>
+              <p className="flex items-center gap-2 text-sm text-white/80"><MailIcon /> info@codesolveafrica.co.ke</p>
+              <p className="flex items-center gap-2 text-sm text-white/80"><LocationIcon /> Nairobi, Kenya</p>
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-white/20 pt-4 text-center text-xs text-white/80">
+            Made with love ❤️ by{" "}
+            <a
+              href="https://codesolveafrica.co.ke"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-amber-300 underline-offset-2 hover:underline"
+            >
+              codesolveafrica
+            </a>
+          </div>
+        </footer>
       </div>
     </div>
   );

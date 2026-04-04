@@ -8,6 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import Card from "../components/ui/Card";
+import PageHeader from "../components/ui/PageHeader";
 
 const ResponsiveContainerAny = ResponsiveContainer as any;
 const LineChartAny = LineChart as any;
@@ -16,8 +18,26 @@ const YAxisAny = YAxis as any;
 const LineAny = Line as any;
 const TooltipAny = Tooltip as any;
 
+type Transaction = {
+  created_at: string;
+  airtime_value: number;
+  amount_paid: number;
+  status: string;
+};
+
+type ChartPoint = {
+  day: string;
+  profit: number;
+};
+
+const statCards = [
+  { key: "total", label: "Total Transactions", prefix: "" },
+  { key: "profit", label: "Total Profit", prefix: "KES " },
+  { key: "successRate", label: "Success Rate", prefix: "", suffix: "%" },
+] as const;
+
 export default function Dashboard() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<ChartPoint[]>([]);
   const [stats, setStats] = useState({
     total: 0,
     profit: 0,
@@ -26,27 +46,21 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     const res = await api.get("/admin/transactions");
-    const tx = res.data;
+    const tx = res.data as Transaction[];
 
-    // Group by day
     const grouped: Record<string, number> = {};
-
     let success = 0;
 
-    tx.forEach((t: any) => {
+    tx.forEach((t) => {
       const day = new Date(t.created_at).toLocaleDateString();
-
       const profit = t.airtime_value - t.amount_paid;
-
       grouped[day] = (grouped[day] || 0) + profit;
-
       if (t.status === "SUCCESS") success++;
     });
 
-    const chartData = Object.keys(grouped).map((d) => ({
-      day: d,
-      profit: grouped[d],
-    }));
+    const chartData = Object.entries(grouped)
+      .map(([day, profit]) => ({ day, profit }))
+      .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
 
     setData(chartData);
 
@@ -64,35 +78,46 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Dashboard</h2>
+    <div className="app-section">
+      <PageHeader
+        eyebrow="Overview"
+        title="Dashboard"
+        description="Track transaction volume, profitability, and success performance in real-time."
+      />
 
-      {/* STATS */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-white rounded-xl shadow">
-          Total: {stats.total}
-        </div>
-        <div className="p-4 bg-white rounded-xl shadow">
-          Profit: {stats.profit}
-        </div>
-        <div className="p-4 bg-white rounded-xl shadow">
-          Success: {stats.successRate}%
-        </div>
+      <div className="app-grid sm:grid-cols-2 xl:grid-cols-3">
+        {statCards.map((card) => (
+          <Card key={card.key} className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+              {card.label}
+            </p>
+            <p className="text-2xl font-semibold text-slate-900">
+              {card.prefix}
+              {stats[card.key].toLocaleString()}
+              {card.suffix ?? ""}
+            </p>
+          </Card>
+        ))}
       </div>
 
-      {/* CHART */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h3 className="mb-4 font-semibold">Daily Profit</h3>
-
-        <ResponsiveContainerAny width="100%" height={300}>
-          <LineChartAny data={data}>
-            <XAxisAny dataKey="day" />
-            <YAxisAny />
-            <TooltipAny />
-            <LineAny type="monotone" dataKey="profit" />
-          </LineChartAny>
-        </ResponsiveContainerAny>
-      </div>
+      <Card title="Daily Profit" description="Profit trend grouped by transaction date.">
+        <div className="h-[300px] w-full">
+          <ResponsiveContainerAny width="100%" height="100%">
+            <LineChartAny data={data}>
+              <XAxisAny dataKey="day" tick={{ fontSize: 12 }} stroke="#64748b" />
+              <YAxisAny tick={{ fontSize: 12 }} stroke="#64748b" />
+              <TooltipAny />
+              <LineAny
+                type="monotone"
+                dataKey="profit"
+                stroke="#4f6bff"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChartAny>
+          </ResponsiveContainerAny>
+        </div>
+      </Card>
     </div>
   );
 }

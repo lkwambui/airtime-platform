@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import type { Device } from "../types/device";
+import Badge from "../components/ui/Badge";
+import Card from "../components/ui/Card";
+import PageHeader from "../components/ui/PageHeader";
 
 export default function Devices() {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -37,45 +40,46 @@ export default function Devices() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-2xl font-bold">Devices</h2>
+    <div className="app-section">
+      <PageHeader
+        eyebrow="Infrastructure"
+        title="Devices"
+        description="View connected devices and monitor battery and connection status."
+      />
 
-      <div className="grid gap-4">
+      <div className="app-grid md:grid-cols-2">
         {devices.map((d) => (
-          <div
-            key={d.id}
-            className="border rounded-lg p-4 flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold">{d.name}</p>
-              {d.brand && <p className="text-sm text-gray-500">{d.brand}</p>}
-              <p className="text-sm">
-                Last Seen:{" "}
+          <Card key={d.id} className="space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-base font-semibold text-slate-900">{d.name}</p>
+                {d.brand && <p className="text-sm text-slate-500">{d.brand}</p>}
+              </div>
+              <Badge variant={d.status === "ONLINE" ? "success" : "danger"}>{d.status}</Badge>
+            </div>
+
+            <div className="grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+              <p>
+                <span className="font-medium text-slate-700">Battery:</span>{" "}
+                {d.battery != null ? `${d.battery}%` : "—"}
+              </p>
+              <p>
+                <span className="font-medium text-slate-700">Charging:</span>{" "}
+                {d.charging == null ? "—" : d.charging ? "Yes" : "No"}
+              </p>
+              <p className="sm:col-span-2">
+                <span className="font-medium text-slate-700">Last seen:</span>{" "}
                 {d.last_seen ? new Date(d.last_seen).toLocaleString() : "—"}
               </p>
             </div>
-
-            <div className="text-right space-y-1">
-              <p>🔋 {d.battery != null ? `${d.battery}%` : "—"}</p>
-              <p>
-                {d.charging == null
-                  ? "—"
-                  : d.charging
-                  ? "⚡ Charging"
-                  : "🔌 Not Charging"}
-              </p>
-              <p
-                className={
-                  d.status === "ONLINE"
-                    ? "text-green-600"
-                    : "text-red-500"
-                }
-              >
-                {d.status}
-              </p>
-            </div>
-          </div>
+          </Card>
         ))}
+
+        {devices.length === 0 && (
+          <Card className="md:col-span-2">
+            <p className="py-6 text-center text-sm text-slate-500">No devices available.</p>
+          </Card>
+        )}
       </div>
     </div>
   );

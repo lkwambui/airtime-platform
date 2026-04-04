@@ -1,3 +1,6 @@
+import Badge from "./ui/Badge";
+import Card from "./ui/Card";
+
 type Props = {
   rate: number;
   inStock: boolean;
@@ -5,22 +8,20 @@ type Props = {
 
 export default function RateDisplay({ rate, inStock }: Props) {
   return (
-    <div className="bg-gradient-to-r from-gray-100 to-white border border-gray-400 rounded-2xl p-6 backdrop-blur-sm hover:border-gray-500 transition-all duration-300">
+    <Card className="bg-gradient-to-r from-slate-50 to-white">
       {inStock ? (
-        <div className="text-center space-y-2">
-          <p className="text-sm font-medium text-gray-800 uppercase tracking-wider">Today&apos;s Rate</p>
-          <div className="text-5xl font-bold text-gray-900">
-            {rate}%
-          </div>
-          <p className="text-xs font-semibold text-gray-700">● In Stock</p>
+        <div className="space-y-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">Today&apos;s Rate</p>
+          <div className="text-4xl font-bold text-slate-900 md:text-5xl">{rate}%</div>
+          <Badge variant="success">In Stock</Badge>
         </div>
       ) : (
-        <div className="text-center space-y-2">
-          <p className="text-sm font-medium text-gray-800 uppercase tracking-wider">Status</p>
-          <p className="text-2xl font-bold text-gray-700">Out of Stock</p>
-          <p className="text-xs font-semibold text-gray-700">● Unavailable</p>
+        <div className="space-y-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">Status</p>
+          <p className="text-2xl font-bold text-slate-700">Out of Stock</p>
+          <Badge variant="danger">Unavailable</Badge>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

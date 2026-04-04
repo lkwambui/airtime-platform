@@ -1,3 +1,5 @@
+import Card from "./ui/Card";
+
 function WhyBuy() {
   const benefits = [
     {
@@ -33,12 +35,12 @@ function WhyBuy() {
   ];
 
   return (
-    <section className="bg-gradient-to-br from-gray-100 via-gray-200 to-white backdrop-blur-xl border border-gray-400 rounded-3xl shadow-xl p-6 md:p-8 transition-all duration-300">
+    <Card className="bg-gradient-to-br from-slate-100 via-white to-brand-50/30">
       <div className="space-y-2 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-700">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
           Why Choose Kredo ChapChap
         </p>
-        <h2 className="text-2xl md:text-3xl font-bold leading-tight text-gray-900">
+        <h2 className="text-2xl font-bold leading-tight text-slate-900 md:text-3xl">
           Better rates, faster airtime, zero guesswork.
         </h2>
       </div>
@@ -47,16 +49,16 @@ function WhyBuy() {
         {benefits.map((benefit) => (
           <article
             key={benefit.title}
-            className="bg-white border border-gray-300 rounded-2xl p-4 md:p-5 flex items-start gap-3 md:gap-4"
+            className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:shadow-soft md:gap-4 md:p-5"
           >
-            <span className="bg-gray-200 w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-base md:text-lg shrink-0">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-base md:h-10 md:w-10 md:text-lg">
               {benefit.icon}
             </span>
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-gray-900 md:text-base">
+              <h3 className="text-sm font-semibold text-slate-900 md:text-base">
                 {benefit.title}
               </h3>
-              <p className="text-xs leading-relaxed text-gray-700 md:text-sm">
+              <p className="text-xs leading-relaxed text-slate-600 md:text-sm">
                 {benefit.description}
               </p>
             </div>
@@ -64,10 +66,10 @@ function WhyBuy() {
         ))}
       </div>
 
-      <div className="mt-5 rounded-2xl px-4 py-3 text-sm font-medium text-center bg-gray-100 text-gray-800 border border-gray-400">
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-medium text-slate-700">
         Trusted checkout with M-PESA • Transparent totals before payment
       </div>
-    </section>
+    </Card>
   );
 }
 

@@ -1,30 +1,26 @@
+import Card from "./ui/Card";
+
 type Props = {
   amount: number;
   rate: number;
 };
 
 export default function AirtimePreview({ amount, rate }: Props) {
-  
-  const airtime =
-    amount > 0 ? Math.round(amount * rate) : 0;
+  const airtime = amount > 0 ? Math.round(amount * rate) : 0;
 
   return (
-    <div className="relative group">
-      <div className="absolute -inset-0.5 bg-linear-to-r from-cyan-500 to-blue-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-300" />
-
-      <div className="relative bg-linear-to-br from-gray-100 to-gray-50 border border-gray-200/50 rounded-2xl p-6 text-center space-y-2">
-        <p className="text-sm font-medium text-gray-800 uppercase tracking-wider">
+    <Card className="border-brand-100 bg-gradient-to-br from-brand-50/70 to-white text-center">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
           You will receive
         </p>
 
-        <div className="text-4xl md:text-5xl font-bold bg-linear-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+        <div className="bg-gradient-to-r from-emerald-500 via-brand-500 to-brand-700 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
           KES {airtime}
         </div>
 
-        <p className="text-xs font-semibold text-gray-800">
-          in airtime credit
-        </p>
+        <p className="text-xs font-semibold text-slate-700">in airtime credit</p>
       </div>
-    </div>
+    </Card>
   );
 }

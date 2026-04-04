@@ -1,20 +1,21 @@
 import { NavLink } from "react-router-dom";
-
+import { cn } from "../utils/cn";
 
 const linkClasses = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${
+  cn(
+    "flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200",
     isActive
-      ? "bg-cyan-100 text-cyan-700 shadow"
-      : "text-slate-700 hover:bg-slate-100"
-  }`;
+      ? "bg-brand-100 text-brand-700 shadow-sm"
+      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900",
+  );
 
 export default function Sidebar() {
   return (
-    <aside className="rounded-2xl bg-white/80 border border-slate-100 p-4 shadow-md min-w-[180px]">
-      <div className="px-2 py-2 mb-2">
-        <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold">Menu</p>
+    <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:sticky lg:top-24">
+      <div className="mb-2 px-2 py-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Navigation</p>
       </div>
-      <nav className="flex flex-col gap-1">
+      <nav className="grid gap-1" aria-label="Admin primary navigation">
         <NavLink to="/dashboard" className={linkClasses}>
           Dashboard
         </NavLink>
