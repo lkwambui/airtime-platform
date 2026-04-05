@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "db:patch:prod": "sh -c 'if [ -z \"$DATABASE_URL\" ]; then echo \"DATABASE_URL is required\"; exit 1; fi; psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f src/database/migrations/009_align_production_schema_idempotent.sql'"
   },
   "author": "",
   "license": "ISC",

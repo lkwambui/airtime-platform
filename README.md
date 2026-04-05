@@ -75,6 +75,18 @@ psql -U <user> -d <database> -f backend/src/database/migrations/008_add_jobs_and
 psql -U <user> -d <database> -f backend/src/database/seeds/admin_seed.sql
 ```
 
+## Production DB Patching (Neon)
+
+Use this idempotent migration when production schema needs to be aligned safely:
+
+```bash
+psql "<neon-connection-string>" -v ON_ERROR_STOP=1 -f backend/src/database/migrations/009_align_production_schema_idempotent.sql
+```
+
+Notes:
+- Safe to re-run (`IF NOT EXISTS` / guarded `ALTER` statements).
+- If a database URL is exposed in logs/chat, rotate the Neon password/secret immediately.
+
 ## Deployment on Render
 
 Deploy all three services using the included `render.yaml` blueprint.
