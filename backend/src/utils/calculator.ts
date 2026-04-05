@@ -15,5 +15,5 @@ export function calculateAirtime(amount: number, rate: number) {
     throw new Error("INVALID_RATE");
   }
 
-  return Math.floor((numericAmount * numericRate) / 100);
+  return Math.floor(numericAmount / (numericRate / 100));
 }

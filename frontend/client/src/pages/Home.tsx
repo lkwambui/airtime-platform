@@ -88,7 +88,7 @@ function getNairobiTime() {
 function calculateExpectedAirtime(amount: number, rate: number) {
   if (!Number.isFinite(amount) || amount <= 0) return 0;
   if (!Number.isFinite(rate) || rate <= 0) return 0;
-  return Math.floor((amount * rate) / 100);
+  return Math.floor(amount / (rate / 100));
 }
 
 export default function Home() {
