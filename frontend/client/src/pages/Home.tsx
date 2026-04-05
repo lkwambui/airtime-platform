@@ -85,6 +85,12 @@ function getNairobiTime() {
   });
 }
 
+function calculateExpectedAirtime(amount: number, rate: number) {
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  if (!Number.isFinite(rate) || rate <= 0) return 0;
+  return Math.floor((amount * rate) / 100);
+}
+
 export default function Home() {
   const { showToast } = useToast();
   const [nairobiTime, setNairobiTime] = useState(getNairobiTime());
@@ -136,8 +142,18 @@ export default function Home() {
     setError(null);
 
     try {
-      await api.post("/payments/pay", data);
-      showToast("STK Push sent successfully! Check your phone.", "success");
+      const response = await api.post("/payments/pay", data);
+      const airtimeValue = Number((response.data as { airtimeValue?: number } | undefined)?.airtimeValue);
+
+      if (Number.isFinite(airtimeValue) && airtimeValue > 0) {
+        showToast(
+          `STK Push sent successfully! You will receive KES ${Math.floor(airtimeValue).toLocaleString()} airtime.`,
+          "success"
+        );
+      } else {
+        showToast("STK Push sent successfully! Check your phone.", "success");
+      }
+
       setSelectedAmount(0);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -234,7 +250,11 @@ export default function Home() {
             <div className="order-1 p-6 md:p-8 lg:order-2">
               {selectedAmount > 0 && (
                 <div className="mb-4 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
-                  You are about to pay <span className="font-semibold">KES {selectedAmount.toLocaleString()}</span>.
+                  You are about to pay <span className="font-semibold">KES {selectedAmount.toLocaleString()}</span> and receive{" "}
+                  <span className="font-semibold">
+                    KES {calculateExpectedAirtime(selectedAmount, rate).toLocaleString()}
+                  </span>{" "}
+                  airtime.
                 </div>
               )}
 

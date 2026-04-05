@@ -63,6 +63,12 @@ export async function initiatePayment(req: Request, res: Response) {
     // calculate airtime
     const airtime = calculateAirtime(amountValue, rate);
 
+    if (!Number.isInteger(airtime) || airtime <= 0) {
+      return res.status(400).json({
+        message: "Computed airtime is invalid. Check current rate and amount.",
+      });
+    }
+
     // save transaction
     const txResult = await db.query(
       `INSERT INTO transactions
@@ -93,6 +99,7 @@ export async function initiatePayment(req: Request, res: Response) {
     res.json({
       message: "STK Push sent",
       transactionId: txId,
+      airtimeValue: airtime,
     });
   } catch (error) {
     logError("Payment initiation failed", error);
