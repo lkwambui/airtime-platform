@@ -296,7 +296,7 @@ export default function Home() {
           <div className="mt-6">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-white/90">Contact</h3>
             <div className="mt-3 grid gap-2 md:grid-cols-3">
-              <p className="flex items-center gap-2 text-sm text-white/80"><PhoneIcon /> +254 700 000 000</p>
+              <p className="flex items-center gap-2 text-sm text-white/80"><PhoneIcon /> +254799656264</p>
               <p className="flex items-center gap-2 text-sm text-white/80"><MailIcon /> info@codesolveafrica.co.ke</p>
               <p className="flex items-center gap-2 text-sm text-white/80"><LocationIcon /> Nairobi, Kenya</p>
             </div>
