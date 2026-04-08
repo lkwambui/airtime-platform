@@ -48,17 +48,19 @@ export async function mpesaCallback(req: Request, res: Response) {
       });
 
       try {
-        // 🔥 Create job for phone automation
+        // 🔥 STEP 1: CREATE JOB
         await createAirtimeJob(
           transactionId,
           tx.receiver_phone,
           tx.airtime_value
         );
 
-        // ✅🔥 VERY IMPORTANT: UPDATE STATUS TO SUCCESS
+        // 🔥 STEP 2: SET STATUS TO WAITING (NOT SUCCESS)
+        // createAirtimeJob may set WAITING_ETOPUP or WAITING_DEVICE,
+        // but we explicitly confirm WAITING_ETOPUP here so the device picks it up.
         await db.query(
           "UPDATE transactions SET status=$1 WHERE id=$2",
-          ["SUCCESS", transactionId]
+          ["WAITING_ETOPUP", transactionId]
         );
 
         logInfo("Airtime job created", {
