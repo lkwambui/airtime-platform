@@ -43,18 +43,24 @@ export async function devicePing(req: Request, res: Response) {
       return res.status(400).json({ message: "charging must be boolean" });
     }
 
-    await db.query(
-      `
-      UPDATE devices
-      SET
-        status='ONLINE',
-        battery=$1,
-        charging=$2,
-        last_seen=NOW()
-      WHERE name=$3
-      `,
-      [battery, charging, deviceId]
+    const existing = await db.query(
+      "SELECT id FROM devices WHERE name=$1",
+      [deviceId]
     );
+
+    if (existing.rows.length === 0) {
+      await db.query(
+        "INSERT INTO devices (name, status, battery, charging, last_seen) VALUES ($1, 'ONLINE', $2, $3, NOW())",
+        [deviceId, battery ?? 0, charging ?? false]
+      );
+      logInfo("New device registered", { deviceId });
+    } else {
+      await db.query(
+        `UPDATE devices SET status='ONLINE', battery=$1, charging=$2, last_seen=NOW() WHERE name=$3`,
+        [battery ?? 0, charging ?? false, deviceId]
+      );
+      logInfo("Device updated", { deviceId });
+    }
 
     res.json({ success: true });
   } catch (error) {
