@@ -84,7 +84,7 @@ export async function getJobs(req: Request, res: Response) {
     const result = await db.query(
       `
       SELECT * FROM jobs
-      WHERE status='PENDING'
+      WHERE status='WAITING_ETOPUP'
       LIMIT 1
       `
     );
