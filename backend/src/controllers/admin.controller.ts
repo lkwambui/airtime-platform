@@ -205,21 +205,84 @@ export async function getTransactions(req: Request, res: Response) {
     const result = await db.query(`
       SELECT 
         id,
+        payer_phone,
         receiver_phone,
         amount_paid,
         airtime_value,
+        rate_used,
         status,
+        mpesa_reference,
+        checkout_request_id,
         assigned_device,
-        created_at
+        balance_before,
+        balance_after,
+        retried_by,
+        retried_at,
+        created_at,
+        updated_at
       FROM transactions
       ORDER BY created_at DESC
-      LIMIT 100
+      LIMIT 200
     `);
 
     res.json(result.rows);
   } catch (error) {
     logError("Fetch transactions failed", error);
     res.status(500).json({ message: "Failed to fetch transactions" });
+  }
+}
+
+/**
+ * 📈 DASHBOARD STATS
+ */
+export async function getDashboardStats(req: Request, res: Response) {
+  try {
+    const statsWeekly = await db.query(`
+      SELECT 
+        COALESCE(SUM(CASE WHEN payer_phone IS NOT NULL THEN amount_paid ELSE 0 END), 0) AS mpesa_received,
+        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN airtime_value ELSE 0 END), 0) AS airtime_sent
+      FROM transactions
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+    `);
+
+    const statsMonthly = await db.query(`
+      SELECT 
+        COALESCE(SUM(CASE WHEN payer_phone IS NOT NULL THEN amount_paid ELSE 0 END), 0) AS mpesa_received,
+        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN airtime_value ELSE 0 END), 0) AS airtime_sent
+      FROM transactions
+      WHERE created_at >= DATE_TRUNC('month', NOW())
+    `);
+
+    const chart = await db.query(`
+      SELECT 
+        TO_CHAR(created_at, 'Dy') AS day,
+        EXTRACT(DOW FROM created_at)::int AS dow,
+        COALESCE(SUM(CASE WHEN payer_phone IS NOT NULL THEN amount_paid ELSE 0 END), 0) AS mpesa,
+        COALESCE(SUM(CASE WHEN status = 'SUCCESS' THEN airtime_value ELSE 0 END), 0) AS airtime
+      FROM transactions
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+      GROUP BY TO_CHAR(created_at, 'Dy'), EXTRACT(DOW FROM created_at)
+      ORDER BY dow
+    `);
+
+    res.json({
+      weekly: {
+        mpesaReceived: Number(statsWeekly.rows[0].mpesa_received),
+        airtimeSent: Number(statsWeekly.rows[0].airtime_sent),
+      },
+      monthly: {
+        mpesaReceived: Number(statsMonthly.rows[0].mpesa_received),
+        airtimeSent: Number(statsMonthly.rows[0].airtime_sent),
+      },
+      chart: chart.rows.map((r) => ({
+        day: r.day,
+        mpesa: Number(r.mpesa),
+        airtime: Number(r.airtime),
+      })),
+    });
+  } catch (error) {
+    logError("Fetch dashboard stats failed", error);
+    res.status(500).json({ message: "Failed to fetch dashboard stats" });
   }
 }
 

@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "nodemon",
+    "dev": "NODE_OPTIONS=--dns-result-order=ipv4first nodemon",
     "build": "tsc",
     "start": "node dist/server.js",
     "db:patch:prod": "sh -c 'if [ -z \"$DATABASE_URL\" ]; then echo \"DATABASE_URL is required\"; exit 1; fi; psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f src/database/migrations/009_align_production_schema_idempotent.sql'"
@@ -16,6 +16,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@types/ws": "^8.18.1",
     "axios": "^1.14.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
@@ -23,7 +25,8 @@
     "express": "^4.22.1",
     "jsonwebtoken": "^9.0.3",
     "moment": "^2.30.1",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

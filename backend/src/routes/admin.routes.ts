@@ -6,7 +6,8 @@ import {
   toggleDevice,
   manualAirtime,
   getTransactions,
-  getDevices, // ✅ NEW
+  getDevices,
+  getDashboardStats,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -17,8 +18,9 @@ const router = Router();
 router.post("/login", adminLogin);
 
 /**
- * 📊 TRANSACTIONS
+ * 📊 STATS & TRANSACTIONS
  */
+router.get("/dashboard-stats", getDashboardStats);
 router.get("/transactions", getTransactions);
 
 /**
