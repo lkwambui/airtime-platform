@@ -47,19 +47,42 @@ export async function mpesaCallback(req: Request, res: Response) {
         checkoutRequestId,
       });
 
+      // 🔥 EXTRACT MPESA DETAILS
+      const items = callback.CallbackMetadata?.Item || [];
+
+      let mpesaCode = "";
+      let amountPaid = 0;
+
+      for (const item of items) {
+        if (item.Name === "MpesaReceiptNumber") {
+          mpesaCode = item.Value;
+        }
+        if (item.Name === "Amount") {
+          amountPaid = item.Value;
+        }
+      }
+
       try {
-        // 🔥 STEP 1: CREATE JOB
+        // 🔥 SAVE MPESA CODE + AMOUNT
+        await db.query(
+          `UPDATE transactions 
+           SET mpesa_code=$1, amount_paid=$2 
+           WHERE id=$3`,
+          [mpesaCode, amountPaid, transactionId]
+        );
+
+        // 🔥 CREATE AIRTIME JOB(S)
         await createAirtimeJob(
           transactionId,
           tx.receiver_phone,
           tx.airtime_value
         );
 
-        // 🔥 STEP 2: SET STATUS TO WAITING (NOT SUCCESS)
-        // createAirtimeJob may set WAITING_ETOPUP or WAITING_DEVICE,
-        // but we explicitly confirm WAITING_ETOPUP here so the device picks it up.
+        // 🔥 SET STATUS → WAITING ETOPUP
         await db.query(
-          "UPDATE transactions SET status=$1 WHERE id=$2",
+          `UPDATE transactions 
+           SET status=$1, updated_at=NOW() 
+           WHERE id=$2`,
           ["WAITING_ETOPUP", transactionId]
         );
 
@@ -67,13 +90,17 @@ export async function mpesaCallback(req: Request, res: Response) {
           transactionId,
           phone: tx.receiver_phone,
           amount: tx.airtime_value,
+          mpesaCode,
+          amountPaid,
         });
 
       } catch (jobError) {
         logError("Failed to create airtime job", jobError);
 
         await db.query(
-          "UPDATE transactions SET status=$1 WHERE id=$2",
+          `UPDATE transactions 
+           SET status=$1, updated_at=NOW() 
+           WHERE id=$2`,
           ["FAILED", transactionId]
         );
       }
@@ -88,7 +115,9 @@ export async function mpesaCallback(req: Request, res: Response) {
       });
 
       await db.query(
-        "UPDATE transactions SET status=$1 WHERE id=$2",
+        `UPDATE transactions 
+         SET status=$1, updated_at=NOW() 
+         WHERE id=$2`,
         ["FAILED", transactionId]
       );
     }
