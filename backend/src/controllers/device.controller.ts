@@ -7,7 +7,9 @@ const ALLOWED_JOB_STATUSES = ["PENDING", "SUCCESS", "FAILED"] as const;
 function parseJobStatus(status: unknown) {
   if (typeof status !== "string") return null;
   const normalized = status.trim().toUpperCase();
-  return ALLOWED_JOB_STATUSES.includes(normalized as (typeof ALLOWED_JOB_STATUSES)[number])
+  return ALLOWED_JOB_STATUSES.includes(
+    normalized as (typeof ALLOWED_JOB_STATUSES)[number]
+  )
     ? normalized
     : null;
 }
@@ -23,6 +25,9 @@ function verifyDevice(req: Request) {
   return key === `Bearer ${process.env.DEVICE_API_KEY}`;
 }
 
+/**
+ * 📡 DEVICE PING
+ */
 export async function devicePing(req: Request, res: Response) {
   try {
     if (!verifyDevice(req)) {
@@ -35,12 +40,19 @@ export async function devicePing(req: Request, res: Response) {
       return res.status(400).json({ message: "deviceId is required" });
     }
 
-    if (battery !== undefined && (typeof battery !== "number" || battery < 0 || battery > 100)) {
-      return res.status(400).json({ message: "battery must be a number between 0 and 100" });
+    if (
+      battery !== undefined &&
+      (typeof battery !== "number" || battery < 0 || battery > 100)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "battery must be a number between 0 and 100" });
     }
 
     if (charging !== undefined && typeof charging !== "boolean") {
-      return res.status(400).json({ message: "charging must be boolean" });
+      return res
+        .status(400)
+        .json({ message: "charging must be boolean" });
     }
 
     const existing = await db.query(
@@ -56,7 +68,9 @@ export async function devicePing(req: Request, res: Response) {
       logInfo("New device registered", { deviceId });
     } else {
       await db.query(
-        `UPDATE devices SET status='ONLINE', battery=$1, charging=$2, last_seen=NOW() WHERE name=$3`,
+        `UPDATE devices 
+         SET status='ONLINE', battery=$1, charging=$2, last_seen=NOW() 
+         WHERE name=$3`,
         [battery ?? 0, charging ?? false, deviceId]
       );
       logInfo("Device updated", { deviceId });
@@ -69,79 +83,88 @@ export async function devicePing(req: Request, res: Response) {
   }
 }
 
-export async function getJobs(req: Request, res: Response) {
+/**
+ * 📥 DEVICE RESULT (🔥 FINAL LOGIC)
+ */
+export async function deviceResult(req: Request, res: Response) {
   try {
     if (!verifyDevice(req)) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { device } = req.query;
-
-    if (device !== undefined && typeof device !== "string") {
-      return res.status(400).json({ message: "device query must be a string" });
-    }
-
-    const result = await db.query(
-      `
-      SELECT * FROM jobs
-      WHERE status='WAITING_ETOPUP'
-      LIMIT 1
-      `
-    );
-
-    if (result.rows.length === 0) {
-      return res.json({ job: null });
-    }
-
-    logInfo("Job fetched for device", {
-      device: device || null,
-      jobId: result.rows[0].id,
-    });
-
-    res.json({ job: result.rows[0] });
-  } catch (error) {
-    logError("Get jobs failed", error);
-    res.status(500).json({ message: "Failed to fetch jobs" });
-  }
-}
-
-export async function submitResult(req: Request, res: Response) {
-  try {
-    if (!verifyDevice(req)) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const { jobId, status } = req.body;
+    const { jobId, status, message } = req.body;
 
     const parsedJobId = parseJobId(jobId);
-    if (!parsedJobId) {
-      return res.status(400).json({ message: "jobId must be a positive integer" });
-    }
-
     const parsedStatus = parseJobStatus(status);
-    if (!parsedStatus) {
-      return res.status(400).json({
-        message: `status must be one of: ${ALLOWED_JOB_STATUSES.join(", ")}`,
-      });
+
+    if (!parsedJobId || !parsedStatus) {
+      return res
+        .status(400)
+        .json({ message: "Invalid jobId or status" });
     }
 
-    const result = await db.query(
-      `
-      UPDATE jobs
-      SET status=$1, updated_at=NOW()
-      WHERE id=$2
-      `,
-      [parsedStatus, parsedJobId]
+    // 🔥 1. UPDATE JOB
+    const jobResult = await db.query(
+      `UPDATE airtime_jobs 
+       SET status=$1, response=$2, updated_at=NOW() 
+       WHERE id=$3 
+       RETURNING *`,
+      [parsedStatus, message ?? "", parsedJobId]
     );
 
-    if (result.rowCount === 0) {
+    const job = jobResult.rows[0];
+
+    if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    logInfo("Job result updated", { jobId: parsedJobId, status: parsedStatus });
-    res.json({ message: "Result updated" });
+    const transactionId = job.transaction_id;
+
+    logInfo("Job updated", {
+      jobId: parsedJobId,
+      status: parsedStatus,
+      transactionId,
+    });
+
+    // 🔥 2. IF ANY JOB FAILS → FAIL WHOLE TRANSACTION
+    if (parsedStatus === "FAILED") {
+      await db.query(
+        `UPDATE transactions 
+         SET status='FAILED', updated_at=NOW() 
+         WHERE id=$1`,
+        [transactionId]
+      );
+
+      logInfo("Transaction FAILED due to job failure", {
+        transactionId,
+      });
+
+      return res.json({ success: true });
+    }
+
+    // 🔥 3. CHECK IF ALL JOBS ARE SUCCESS
+    const pending = await db.query(
+      `SELECT id FROM airtime_jobs 
+       WHERE transaction_id=$1 AND status!='SUCCESS'`,
+      [transactionId]
+    );
+
+    if (pending.rows.length === 0) {
+      await db.query(
+        `UPDATE transactions 
+         SET status='SUCCESS', updated_at=NOW() 
+         WHERE id=$1`,
+        [transactionId]
+      );
+
+      logInfo("🎉 ALL JOBS COMPLETED → TRANSACTION SUCCESS", {
+        transactionId,
+      });
+    }
+
+    res.json({ success: true });
   } catch (error) {
-    logError("Submit result failed", error);
-    res.status(500).json({ message: "Failed to update result" });
+    logError("Device result failed", error);
+    res.status(500).json({ message: "Result failed" });
   }
-}
+                                 }
